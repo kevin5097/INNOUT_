@@ -178,6 +178,53 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 
 .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e8449; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 999; display: none; }
 
+/* TEAM ASSIGN (IN/OUT) */
+.team-count-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.tc-box { border-radius: 10px; padding: 10px; text-align: center; background: #0f3460; border: 1px solid #2a3a5e; }
+.tc-box.in  { border-top: 3px solid #e94560; }
+.tc-box.out { border-top: 3px solid #4a9eff; }
+.tc-box.na  { border-top: 3px solid #555; }
+.tc-box .tc-label { font-size: 12px; color: #aaa; }
+.tc-box .tc-val { font-size: 26px; font-weight: 900; margin-top: 2px; }
+.tc-box.in  .tc-val { color: #e94560; }
+.tc-box.out .tc-val { color: #4a9eff; }
+.tc-box.na  .tc-val { color: #888; }
+
+.ta-row { background: #0f3460; border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.ta-row.in  { border-left: 4px solid #e94560; }
+.ta-row.out { border-left: 4px solid #4a9eff; }
+.ta-row.na  { border-left: 4px solid #444; }
+.ta-name { font-weight: bold; font-size: 14px; flex: 1; min-width: 0; }
+.ta-badges { display: flex; gap: 3px; flex-shrink: 0; }
+.ta-btns { display: flex; gap: 5px; flex-shrink: 0; }
+.ta-btn { padding: 5px 12px; border-radius: 8px; border: 1px solid #333; background: #1a1a2e; color: #aaa; font-size: 12px; font-weight: bold; cursor: pointer; }
+.ta-btn.in.sel  { background: #e94560; color: #fff; border-color: #e94560; }
+.ta-btn.out.sel { background: #4a9eff; color: #fff; border-color: #4a9eff; }
+.ta-group-title { font-size: 13px; font-weight: bold; margin: 12px 0 6px; padding-left: 2px; }
+.ta-group-title.in  { color: #e94560; }
+.ta-group-title.out { color: #4a9eff; }
+.ta-group-title.na  { color: #888; }
+
+/* RULEBOOK */
+.rulebook h2 { margin-bottom: 12px; }
+.rb-notice { background: #2c1810; border: 1px solid #8b4513; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #f0c090; line-height: 1.7; margin-bottom: 12px; }
+.rb-notice b { color: #ffcf9e; }
+.rb-lead { font-size: 13px; color: #ccc; margin-bottom: 14px; line-height: 1.6; }
+.rb-rule { display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid #2a2a4e; }
+.rb-num { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: #e94560; color: #fff; font-weight: 900; font-size: 15px; display: flex; align-items: center; justify-content: center; }
+.rb-body { flex: 1; min-width: 0; }
+.rb-body h4 { font-size: 15px; color: #f5a623; margin-bottom: 6px; }
+.rb-body p { font-size: 13.5px; color: #ddd; line-height: 1.7; margin-bottom: 4px; }
+.rb-body p.rb-sub { color: #aab; font-size: 13px; }
+.rb-body b { color: #fff; }
+.rb-list { list-style: none; margin: 6px 0; padding: 0; }
+.rb-list li { font-size: 13.5px; color: #ddd; line-height: 1.7; padding-left: 16px; position: relative; }
+.rb-list li::before { content: '•'; position: absolute; left: 2px; color: #e94560; }
+.rb-ex { background: #0f3460; border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
+.rb-ex-title { font-size: 12.5px; color: #f5a623; font-weight: bold; margin-bottom: 6px; }
+.rb-ex-line { font-size: 13px; color: #ccc; line-height: 1.8; }
+.rb-score { background: #1a1a2e; border-radius: 6px; padding: 1px 8px; font-weight: bold; color: #fff; }
+
 @media (max-width: 520px) {
   .score-main { grid-template-columns: 1fr auto 1fr; }
   .score-num { font-size: 58px; }
@@ -195,6 +242,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
   <button class="active" onclick="showPage('members',this)">👥 인원</button>
   <button onclick="showPage('attend',this)">🗳 출석부</button>
   <button onclick="showPage('teams',this)">🎽 팀편성</button>
+  <button onclick="showPage('rulebook',this)">📖 룰북</button>
   <button onclick="showPage('score',this)">🏀 스코어</button>
   <button onclick="showPage('tactics',this)">📋 전술</button>
   <button onclick="showPage('videos',this)">🎥 영상</button>
@@ -233,8 +281,8 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 <!-- ========== 1.5 출석부 ========== -->
 <div id="page-attend" class="page">
   <div class="card">
-    <h2>🗳 출석 투표</h2>
-    <p class="text-sm">매주 목요일 · 일요일 운동 — 본인 이름 옆 버튼을 눌러 투표하세요</p>
+    <h2>🗳 출석 체크</h2>
+    <p class="text-sm">매주 목요일 · 일요일 운동 — 참석하는 사람은 이름 옆 <b>참석</b> 버튼을 누르세요 (다시 누르면 취소)</p>
     <div id="attendDateChips" class="date-chip-row mt10"></div>
     <div class="attend-summary mt14" id="attendSummary"></div>
     <div id="attendList" class="mt10"></div>
@@ -246,20 +294,25 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
   </div>
 </div>
 
-<!-- ========== 2. 팀편성 ========== -->
+<!-- ========== 2. 팀편성 (IN / OUT 고정) ========== -->
 <div id="page-teams" class="page">
   <div class="card">
-    <h2>🎽 팀 편성</h2>
-    <div class="row"><select id="teamCount"><option value="2">2팀</option><option value="3">3팀</option><option value="4">4팀</option></select>
-    <button class="btn btn-red" onclick="makeTeams()">🔀 랜덤 팀 나누기</button></div>
-    <p class="text-sm mt6" id="teamsSessionInfo"></p>
-    <p class="text-sm">* 실력+포지션 균등 배분</p>
-    <div class="level-notice mt6">
-      🌱 새싹은 신입이거나 오늘 체력 조절이 필요한 분 — 언제든 🔥 불꽃이 될 수 있어요!
-    </div>
+    <h2>🎽 팀 편성 (IN · OUT)</h2>
+    <p class="text-sm">팀전용 고정 팀 편성입니다. 각 인원을 <b style="color:#e94560">IN</b> / <b style="color:#4a9eff">OUT</b> 팀으로 배정하세요. 배정 결과는 모든 기기에 공유됩니다.</p>
+    <div class="team-count-row mt10" id="teamCountRow"></div>
   </div>
+
   <div class="card">
-    <h3 style="margin:0 0 8px">🙋 게스트 추가</h3>
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <h3 style="margin:0">🧷 팀 배정</h3>
+      <button class="btn btn-sm btn-gray" onclick="loadMembers()">↻ 새로고침</button>
+    </div>
+    <p class="text-sm mt6">이름 옆 버튼으로 팀을 지정합니다. (다시 누르면 배정 해제)</p>
+    <div id="teamAssignList" class="mt10"></div>
+  </div>
+
+  <div class="card">
+    <h3 style="margin:0 0 8px">🙋 게스트 추가 <span class="text-sm">(당일 임시 · 저장 안 됨)</span></h3>
     <div class="row wrap" style="gap:6px;">
       <input id="guestName" placeholder="게스트 이름" style="flex:1;min-width:100px">
       <select id="guestPosition"><option value="앞선">앞선</option><option value="뒷선" selected>뒷선</option></select>
@@ -268,7 +321,98 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
     </div>
     <div id="guestList" class="mt10"></div>
   </div>
-  <div id="teamsResult"></div>
+</div>
+
+<!-- ========== 2.5 룰북 ========== -->
+<div id="page-rulebook" class="page">
+  <div class="card rulebook">
+    <h2>📖 INNOUT 팀전 룰북</h2>
+    <div class="rb-notice">
+      <b>월부터 시작되는 팀전을 공지합니다.</b><br>
+      팀전은 <b>12월까지</b> 진행하며, 부득이하게 팀전이 진행되지 못할 경우 양 팀 주장들과 협의하여 <b>연습경기</b>로 진행합니다.
+    </div>
+    <p class="rb-lead">기본 경기 방식은 동일하며, 추가·로컬룰로 진행할 방식을 안내드립니다.</p>
+
+    <div class="rb-rule">
+      <div class="rb-num">1</div>
+      <div class="rb-body">
+        <h4>팀 인원</h4>
+        <p>양 팀 인원은 아래 명단에서 <b>9 대 9</b>입니다. 명단 이외의 팀원은 참석율이 높아지면 팀장들과 의논 후 추가로 배치하겠습니다.</p>
+      </div>
+    </div>
+
+    <div class="rb-rule">
+      <div class="rb-num">2</div>
+      <div class="rb-body">
+        <h4>팀 파울 · 심판</h4>
+        <p>쿼터별 팀 파울을 적용하며, <b>5개부터 자유투</b>를 진행합니다.</p>
+        <p class="rb-sub">양 팀에 1명씩 심판(게스트 포함)을 둡니다. 부득이하게 한 팀에서 심판을 둘 다 보거나 한 명만 볼 때, 심판 콜에 대한 항의는 자제 부탁드립니다. <b>전문 심판이 아닙니다.</b></p>
+      </div>
+    </div>
+
+    <div class="rb-rule">
+      <div class="rb-num">3</div>
+      <div class="rb-body">
+        <h4>로컬룰 — 인원 부족 시 자유투 보정</h4>
+        <p>한 팀 인원이 <b>5명이 안 될 시</b>, 상대 팀 참석 팀원(게스트 및 깍두기 제외) 전원이 첫 게임 시작 전 자유투를 진행합니다.</p>
+        <ul class="rb-list">
+          <li><b>모두 성공 시</b> → 자유투 성공 횟수 <b>×2</b></li>
+          <li><b>한 명이라도 실패 시</b> → 자유투 성공 횟수 <b>×1</b></li>
+        </ul>
+        <div class="rb-ex">
+          <div class="rb-ex-title">예시) A팀 4명 참석, B팀 6명 참석 → B팀 자유투 진행</div>
+          <div class="rb-ex-line">· 5명 성공: 5 × 1 = <b>5점</b> → <span class="rb-score">A 0 : 5 B</span> 로 경기 시작</div>
+          <div class="rb-ex-line">· 6명 성공: 6 × 2 = <b>12점</b> → <span class="rb-score">A 0 : 12 B</span> 로 경기 시작</div>
+        </div>
+        <p class="rb-sub">당일 경기에 모두 적용됩니다. (참석율을 조금이나마 높이려고 만든 룰입니다.)</p>
+      </div>
+    </div>
+
+    <div class="rb-rule">
+      <div class="rb-num">4</div>
+      <div class="rb-body">
+        <h4>50대 +1 적용</h4>
+        <ul class="rb-list">
+          <li>필드 골 <b>+1점</b> 적용 (자유투는 미적용)</li>
+          <li>바스켓 굿 <b>+1점</b> 적용</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rb-rule">
+      <div class="rb-num">5</div>
+      <div class="rb-body">
+        <h4>데드타임</h4>
+        <p>4쿼터 <b>2분 데드타임</b>을 적용합니다.</p>
+      </div>
+    </div>
+
+    <div class="rb-rule">
+      <div class="rb-num">6</div>
+      <div class="rb-body">
+        <h4>최소 출전 시간</h4>
+        <p>매 경기마다 모든 참석 인원은 <b>최소 2쿼터 이상</b> 참여합니다. 부상 등 정말 부득이한 경우를 제외하고 최소 2쿼터 이상 경기에 참여합니다(게스트 포함).</p>
+        <p class="rb-sub">경기 출전은 팀 주장이 결정하며, 팀 주장 부재 시 팀장이 위임한 팀원이 결정합니다.</p>
+      </div>
+    </div>
+
+    <div class="rb-rule">
+      <div class="rb-num">7</div>
+      <div class="rb-body">
+        <h4>승패 적용</h4>
+        <p>일요 정모 <b>3경기</b>를 진행하여 <b>최다승 팀이 1승</b>을 가져갑니다.</p>
+        <p class="rb-sub">단, 모든 경기 기록을 기재하여 승률이 동률인 경우 <b>골 득실</b>로 최종 우승을 적용합니다.</p>
+      </div>
+    </div>
+
+    <div class="rb-rule">
+      <div class="rb-num">8</div>
+      <div class="rb-body">
+        <h4>명단 외 팀원 · 게스트 참여 시</h4>
+        <p><b>승률이 낮은 팀 주장</b>이 먼저 당일 팀원으로 선점합니다.</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ========== 3. 스코어 ========== -->
@@ -310,40 +454,52 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
   </div>
 </div>
 
-<!-- ========== 새 게임 모달 ========== -->
+<!-- ========== 새 게임 / 지난 게임 모달 ========== -->
 <div class="modal-overlay" id="newGameModal">
   <div class="modal">
-    <h3>🏀 새 게임 설정</h3>
-    <div class="row">
-      <input id="ngNameA" value="팀 A" style="text-align:center;color:#e94560;font-weight:bold">
-      <input id="ngNameB" value="팀 B" style="text-align:center;color:#4a9eff;font-weight:bold">
+    <h3 id="ngTitle">🏀 새 게임 설정</h3>
+    <div id="ngDateWrap" style="display:none">
+      <label>경기 날짜</label>
+      <input id="ngDate" type="date" class="mt6">
+    </div>
+    <div class="row mt10">
+      <input id="ngNameA" value="IN" style="text-align:center;color:#e94560;font-weight:bold">
+      <input id="ngNameB" value="OUT" style="text-align:center;color:#4a9eff;font-weight:bold">
     </div>
     <div class="row mt10" style="gap:6px;">
       <button class="btn btn-sm btn-blue" id="ngModeManualBtn" onclick="ngSetMode('manual')">✍️ 직접 배정</button>
-      <button class="btn btn-sm btn-gray" id="ngModeLoadBtn" onclick="ngSetMode('load')">📥 팀 편성 불러오기</button>
+      <button class="btn btn-sm btn-gray" id="ngModeLoadBtn" onclick="ngSetMode('load')">📥 IN·OUT 전체 불러오기</button>
     </div>
     <div id="ngLoadSection" style="display:none"></div>
     <div id="ngManualWrap">
-      <p class="text-sm mt10">참석 인원 → A/B 팀 배정</p>
+      <p class="text-sm mt10" id="ngRosterHint">✅ 출석자는 고정 팀(IN·OUT)으로 자동 배정됩니다. 필요 시 아래에서 변경하세요.</p>
       <div id="ngMemberList" class="ng-member-list mt6"></div>
       <div class="ng-teams mt10">
         <div class="ng-team-box a">
-          <div style="font-size:13px;color:#e94560;font-weight:bold;margin-bottom:6px">팀 A</div>
+          <div style="font-size:13px;color:#e94560;font-weight:bold;margin-bottom:6px">🔴 IN</div>
           <div id="ngBoxA"></div>
         </div>
         <div class="ng-team-box b">
-          <div style="font-size:13px;color:#4a9eff;font-weight:bold;margin-bottom:6px">팀 B</div>
+          <div style="font-size:13px;color:#4a9eff;font-weight:bold;margin-bottom:6px">🔵 OUT</div>
           <div id="ngBoxB"></div>
         </div>
       </div>
     </div>
+    <div id="ngQuarterWrap" style="display:none">
+      <hr class="divider">
+      <h3 style="color:#f5a623;font-size:14px">🏀 게임별 총 점수</h3>
+      <p class="text-sm">이 날 진행한 게임들의 <b>최종 점수</b>를 게임 단위로 입력하세요. 팀 배정은 위 명단(IN·OUT)이 모든 게임에 공통 적용됩니다.</p>
+      <div id="ngGamesInputs" class="mt6"></div>
+      <button class="btn btn-sm btn-gray mt6" onclick="ngAddPastGame()">+ 게임 추가</button>
+    </div>
     <p style="color:#e94560;font-size:12px;margin-top:6px" id="ngError"></p>
     <div class="row mt14">
-      <button class="btn btn-red" onclick="createGame()">게임 시작</button>
+      <button class="btn btn-red" id="ngSubmitBtn" onclick="createGame()">게임 시작</button>
       <button class="btn btn-gray" onclick="closeNewGameModal()">취소</button>
     </div>
   </div>
 </div>
+
 
 <!-- ========== 전술 등록/수정 모달 ========== -->
 <div class="modal-overlay" id="tacticModal">
@@ -437,14 +593,8 @@ function showPage(id, btn) {
   if (id === 'score')   renderScorePage();
   if (id === 'tactics') renderTactics();
   if (id === 'attend')  renderAttendPage();
-  if (id === 'teams')   { renderTeamsSessionInfo(); renderGuestList(); }
+  if (id === 'teams')   { renderTeamAssign(); renderGuestList(); }
   if (id === 'videos')  loadVideos();
-}
-
-function renderTeamsSessionInfo() {
-  const s = getRelevantSession();
-  document.getElementById('teamsSessionInfo').textContent =
-    `📅 ${s.label} 출석 투표 기준 (참석/늦참)으로 명단을 가져옵니다`;
 }
 
 // ========== TOAST ==========
@@ -520,6 +670,7 @@ function renderMembers() {
       <div class="mc-info">
         <div class="mc-name">${m.name}</div>
         <div class="mc-badges">
+          ${m.team ? `<span class="badge b-${m.team==='IN'?'공격':'수비'}">${m.team}</span>` : ''}
           <span class="badge b-${m.position}">${m.position}</span>
           <span class="badge b-${m.level||'번개'}">${m.level}</span>
           ${m.is_center ? '<span class="badge b-센터">센터</span>' : ''}
@@ -602,17 +753,11 @@ async function selectAttendDate(date) {
 }
 
 function renderAttendSummary() {
-  const go    = attendVotes.filter(v => v.status === '참석').length;
-  const no    = attendVotes.filter(v => v.status === '불참').length;
-  const maybe = attendVotes.filter(v => v.status === '미정').length;
-  const late  = attendVotes.filter(v => v.status === '늦참').length;
-  const pending = members.length - attendVotes.length;
+  const go = attendVotes.filter(v => v.status === '참석').length;
+  const pending = members.length - go;
   document.getElementById('attendSummary').innerHTML = `
     <span>✅ 참석 <b style="color:#1e8449">${go}</b></span>
-    <span>⏰ 늦참 <b style="color:#4a9eff">${late}</b></span>
-    <span>❔ 미정 <b style="color:#d68910">${maybe}</b></span>
-    <span>❌ 불참 <b style="color:#c0392b">${no}</b></span>
-    <span>⬜ 미투표 <b style="color:#888">${pending}</b></span>`;
+    <span>⬜ 미참석 <b style="color:#888">${pending}</b></span>`;
 }
 
 function renderAttendList() {
@@ -621,18 +766,15 @@ function renderAttendList() {
   if (!members.length) { list.innerHTML = '<p class="text-sm tc" style="padding:20px">등록된 인원 없음</p>'; return; }
   list.innerHTML = members.map(m => {
     const v = attendVotes.find(x => x.member_id === m.id);
-    const status = v ? v.status : null;
+    const going = v && v.status === '참석';
     const timeStr = v ? new Date(v.voted_at).toLocaleString('ko-KR', { month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '';
     return `<div class="attend-row">
       <div>
         <div class="attend-name">${m.name}</div>
-        <div class="attend-meta">${status ? `${status} · ${timeStr} 투표` : '미투표'}</div>
+        <div class="attend-meta">${going ? `참석 · ${timeStr}` : '미참석'}</div>
       </div>
       <div class="attend-btns">
-        <button class="av-btn go    ${status==='참석'?'sel':''}" onclick="castVote(${m.id},'참석')">참석</button>
-        <button class="av-btn late  ${status==='늦참'?'sel':''}" onclick="castVote(${m.id},'늦참')">늦참</button>
-        <button class="av-btn maybe ${status==='미정'?'sel':''}" onclick="castVote(${m.id},'미정')">미정</button>
-        <button class="av-btn no    ${status==='불참'?'sel':''}" onclick="castVote(${m.id},'불참')">불참</button>
+        <button class="av-btn go ${going?'sel':''}" onclick="castVote(${m.id},'참석')">${going?'✅ 참석':'참석'}</button>
       </div>
     </div>`;
   }).join('');
@@ -640,12 +782,12 @@ function renderAttendList() {
 
 async function castVote(memberId, status) {
   const existing = attendVotes.find(v => v.member_id === memberId);
-  // 같은 상태를 다시 누르면 투표 취소
+  // 참석을 다시 누르면 취소
   if (existing && existing.status === status) {
     const { error } = await SB.from('attendance').delete()
       .eq('session_date', currentAttendDate).eq('member_id', memberId);
     if (error) { toast('취소 실패: ' + error.message, '#c0392b'); return; }
-    toast('투표 취소됨', '#555');
+    toast('참석 취소됨', '#555');
     await selectAttendDate(currentAttendDate);
     return;
   }
@@ -655,8 +797,8 @@ async function castVote(memberId, status) {
     status,
     voted_at: new Date().toISOString()
   }, { onConflict: 'session_date,member_id' });
-  if (error) { toast('투표 실패: ' + error.message, '#c0392b'); return; }
-  toast(`✅ ${status}으로 투표됨`);
+  if (error) { toast('저장 실패: ' + error.message, '#c0392b'); return; }
+  toast('✅ 참석 체크됨');
   await selectAttendDate(currentAttendDate);
 }
 
@@ -693,7 +835,6 @@ function renderAttendHistory() {
 
 // ========== TEAMS ==========
 let teamGuests = [];   // session-only guests for team formation: {id,name,position,is_center,level:'게스트',is_guest:true}
-let lastTeams = [];    // most recent makeTeams() result: [[member,...], [member,...], ...] — used by score page "팀 편성 불러오기"
 
 function addGuest() {
   const name = document.getElementById('guestName').value.trim();
@@ -734,42 +875,63 @@ function renderGuestList() {
     </div>`).join('');
 }
 
-async function makeTeams() {
-  const session = getRelevantSession();
-  const { data, error } = await SB.from('attendance').select('*')
-    .eq('session_date', session.date).in('status', ['참석','늦참']);
-  if (error) { toast('출석 정보 로드 실패: ' + error.message, '#c0392b'); return; }
-  const goIds = new Set((data || []).map(v => v.member_id));
-  const att = members.filter(m => goIds.has(m.id)).concat(teamGuests);
-  if (att.length < 2) { toast(`${session.label} 참석자 2명 이상 필요 (현재 ${att.length}명, 게스트 포함)`, '#c0392b'); return; }
-  const n = +document.getElementById('teamCount').value;
-  const groups = {};
-  att.forEach(m => {
-    const k = m.level + (m.is_center ? 'C' : m.position);
-    (groups[k] = groups[k] || []).push(m);
-  });
-  Object.values(groups).forEach(g => shuffle(g));
-  const teams = Array.from({length:n}, () => []);
-  let i = 0;
-  Object.values(groups).forEach(g => g.forEach(m => { teams[i%n].push(m); i++; }));
-  lastTeams = teams.filter(t => t.length);
-  const colors = ['#e94560','#4a9eff','#f5a623','#27ae60'];
-  const names = ['팀 A','팀 B','팀 C','팀 D'];
-  document.getElementById('teamsResult').innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px">
-      ${teams.filter(t=>t.length).map((t,i)=>`
-        <div class="card" style="border-top:3px solid ${colors[i]};margin:0">
-          <h3 style="color:${colors[i]};margin-bottom:8px">${names[i]} (${t.length}명)</h3>
-          ${t.map(p=>`<div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:1px solid #1a2a4e">
-            <span class="badge b-${p.level||'번개'}">${p.level}</span>
-            <span class="badge b-${p.is_center?'센터':p.position}">${p.is_center?'센터':p.position}</span>
-            <span style="font-weight:bold;font-size:13px">${p.name}</span>
-          </div>`).join('')}
-        </div>`).join('')}
-    </div>
-    <div class="card mt10 tc"><button class="btn btn-red" onclick="makeTeams()">🔀 다시 섞기</button></div>`;
+// 인원을 IN/OUT/미배정 그룹으로 나눠 렌더
+function renderTeamAssign() {
+  const inList  = members.filter(m => m.team === 'IN');
+  const outList = members.filter(m => m.team === 'OUT');
+  const naList  = members.filter(m => m.team !== 'IN' && m.team !== 'OUT');
+
+  // 상단 카운트
+  document.getElementById('teamCountRow').innerHTML = `
+    <div class="tc-box in"><div class="tc-label">🔴 IN</div><div class="tc-val">${inList.length}</div></div>
+    <div class="tc-box out"><div class="tc-label">🔵 OUT</div><div class="tc-val">${outList.length}</div></div>
+    <div class="tc-box na"><div class="tc-label">미배정</div><div class="tc-val">${naList.length}</div></div>`;
+
+  const el = document.getElementById('teamAssignList');
+  if (!members.length) { el.innerHTML = '<p class="text-sm tc" style="padding:20px">등록된 인원이 없습니다. 인원 탭에서 먼저 추가하세요.</p>'; return; }
+
+  const rowHtml = m => {
+    const t = m.team === 'IN' ? 'in' : m.team === 'OUT' ? 'out' : 'na';
+    return `<div class="ta-row ${t}">
+      <span class="ta-name">${m.name}</span>
+      <span class="ta-badges">
+        <span class="badge b-${m.is_center?'센터':m.position}">${m.is_center?'C':m.position}</span>
+        <span class="badge b-${m.level||'번개'}">${m.level}</span>
+      </span>
+      <span class="ta-btns">
+        <button class="ta-btn in  ${m.team==='IN'?'sel':''}"  onclick="setTeam(${m.id},'IN')">IN</button>
+        <button class="ta-btn out ${m.team==='OUT'?'sel':''}" onclick="setTeam(${m.id},'OUT')">OUT</button>
+      </span>
+    </div>`;
+  };
+
+  let html = '';
+  if (inList.length)  html += `<div class="ta-group-title in">🔴 IN 팀 (${inList.length}명)</div>` + inList.map(rowHtml).join('');
+  if (outList.length) html += `<div class="ta-group-title out">🔵 OUT 팀 (${outList.length}명)</div>` + outList.map(rowHtml).join('');
+  if (naList.length)  html += `<div class="ta-group-title na">⬜ 미배정 (${naList.length}명)</div>` + naList.map(rowHtml).join('');
+  el.innerHTML = html;
 }
-function shuffle(a) { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+// 팀 지정/해제 (같은 팀 다시 누르면 해제)
+async function setTeam(id, team) {
+  const m = members.find(x => x.id === id);
+  if (!m) return;
+  const next = (m.team === team) ? null : team;   // 토글 해제
+  const { error } = await SB.from('members').update({ team: next }).eq('id', id);
+  if (error) {
+    if (/column .*team/i.test(error.message) || error.message.includes('team')) {
+      toast('members 테이블에 team 컬럼이 필요합니다', '#c0392b');
+      alert('Supabase에서 아래 SQL을 한 번만 실행해주세요:\n\nalter table members add column team text;');
+    } else {
+      toast('저장 실패: ' + error.message, '#c0392b');
+    }
+    return;
+  }
+  m.team = next;                 // 로컬 상태 갱신
+  renderTeamAssign();
+  renderMembers();
+  toast(next ? `✅ ${m.name} → ${next}팀` : `${m.name} 배정 해제`, next ? '#1e8449' : '#555');
+}
 
 // ========== VIDEOS ==========
 let videos = [];
@@ -843,25 +1005,47 @@ async function renderScorePage() {
   }
 
   if (currentGame) {
-    renderActiveGame(container);
+    await renderActiveGame(container);
   } else {
     renderLobby(container);
   }
 }
 
 async function renderLobby(container) {
-  const { data: games } = await SB.from('games').select('*, quarters(*)').eq('game_date', TODAY).order('game_number');
+  const { data: games } = await SB.from('games').select('*, quarters(*)')
+    .order('game_date', { ascending: false }).order('game_number');
   const gameList = games || [];
+  const todayGames = gameList.filter(g => g.game_date === TODAY);
+  const pastGames  = gameList.filter(g => g.game_date !== TODAY);
+
+  // 지난 게임을 날짜별로 그룹핑
+  const pastByDate = {};
+  pastGames.forEach(g => { (pastByDate[g.game_date] = pastByDate[g.game_date] || []).push(g); });
+  const pastDates = Object.keys(pastByDate).sort().reverse();
 
   container.innerHTML = `
     <div class="card">
-      <div class="row" style="justify-content:space-between;align-items:center">
+      <div class="row wrap" style="justify-content:space-between;align-items:center;gap:8px">
         <h2 style="margin:0">🏀 오늘 게임 (${TODAY})</h2>
-        <button class="btn btn-red" onclick="openNewGameModal()">+ 새 게임 시작</button>
+        <div class="row" style="gap:6px">
+          <button class="btn btn-sm btn-gray" onclick="openPastGameModal()">📅 지난 게임 등록</button>
+          <button class="btn btn-red" onclick="openNewGameModal()">+ 새 게임 시작</button>
+        </div>
       </div>
     </div>
-    ${gameList.length === 0 ? '<div class="card tc text-dim" style="padding:30px">오늘 진행된 게임이 없습니다</div>' : ''}
-    ${gameList.map(g => renderGameCard(g)).join('')}`;
+    ${todayGames.length === 0 ? '<div class="card tc text-dim" style="padding:24px">오늘 진행된 게임이 없습니다</div>' : ''}
+    ${todayGames.map(g => renderGameCard(g)).join('')}
+    ${pastDates.length ? `<div class="card" style="margin-top:6px"><h2 style="margin:0">📅 지난 게임</h2></div>` : ''}
+    ${pastDates.map(d => `
+      <div style="margin-bottom:4px">
+        <div class="text-sm" style="color:#f5a623;font-weight:bold;margin:8px 2px 4px">${fmtFullDate(d)}</div>
+        ${pastByDate[d].map(g => renderGameCard(g)).join('')}
+      </div>`).join('')}`;
+}
+
+function fmtFullDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  return `${d.getFullYear()}. ${d.getMonth()+1}. ${d.getDate()} (${WD[d.getDay()]})`;
 }
 
 function renderGameCard(g) {
@@ -887,24 +1071,20 @@ function renderGameCard(g) {
       <span style="font-size:18px">▾</span>
     </div>
     <div class="game-card-body" id="gc${g.id}">
-      ${quarters.length === 0 ? '<p class="text-sm" style="padding:4px 0">기록된 쿼터 없음</p>' : ''}
-      ${quarters.map(q => `
-        <div class="quarter-row">
-          <span class="q-label">${q.quarter_number}Q</span>
-          <span class="q-score a">${q.score_a}</span>
-          <span style="color:#555;margin:0 4px">:</span>
-          <span class="q-score b">${q.score_b}</span>
-          <span class="text-sm" style="margin-left:auto">${q.score_a>q.score_b?g.team_a_name:q.score_b>q.score_a?g.team_b_name:'동점'} 리드</span>
-        </div>`).join('')}
-      ${quarters.length > 0 ? `<div style="margin-top:8px;padding-top:6px;border-top:1px solid #2a3a5e;font-size:13px;color:#aaa">
-        최종 결과: <strong style="color:${finalA>finalB?'#e94560':finalA<finalB?'#4a9eff':'#888'}">${winner}</strong>
-        ${finalA !== finalB ? ` | ${Math.abs(finalA-finalB)}점 차` : ''}
-      </div>` : ''}
+      ${quarters.length === 0 ? '<p class="text-sm" style="padding:4px 0">기록된 점수 없음</p>' : `
+        <div style="text-align:center;padding:6px 0">
+          <span style="font-size:15px;color:#e94560;font-weight:bold">${g.team_a_name}</span>
+          <span style="font-size:26px;font-weight:900;margin:0 10px"><span style="color:#e94560">${finalA}</span> : <span style="color:#4a9eff">${finalB}</span></span>
+          <span style="font-size:15px;color:#4a9eff;font-weight:bold">${g.team_b_name}</span>
+        </div>
+        <div style="text-align:center;font-size:13px;color:#aaa">
+          🏆 <strong style="color:${finalA>finalB?'#e94560':finalA<finalB?'#4a9eff':'#888'}">${winner}</strong>${finalA !== finalB ? ` · ${Math.abs(finalA-finalB)}점 차` : ''}
+        </div>`}
       <div style="margin-top:8px;font-size:12px;color:#666">
-        팀A: ${Array.isArray(g.team_a) ? g.team_a.map(m=>m.name).join(', ') : ''}<br>
-        팀B: ${Array.isArray(g.team_b) ? g.team_b.map(m=>m.name).join(', ') : ''}
+        ${g.team_a_name}: ${Array.isArray(g.team_a) ? g.team_a.map(m=>m.name).join(', ') : ''}<br>
+        ${g.team_b_name}: ${Array.isArray(g.team_b) ? g.team_b.map(m=>m.name).join(', ') : ''}
       </div>
-      ${g.status === 'active' ? `<button class="btn btn-sm btn-green mt6" onclick="resumeGame(${g.id})">▶ 게임 재개</button>` : ''}
+      ${g.status === 'active' ? `<button class="btn btn-sm btn-green mt6" onclick="resumeGame(${g.id})">▶ 점수 입력</button>` : ''}
     </div>
   </div>`;
 }
@@ -931,10 +1111,15 @@ async function resumeGame(id) {
   renderScorePage();
 }
 
-function renderActiveGame(container) {
+async function renderActiveGame(container) {
   const g = currentGame;
   const teamA = Array.isArray(g.team_a) ? g.team_a : [];
   const teamB = Array.isArray(g.team_b) ? g.team_b : [];
+  // 이미 저장된 총점이 있으면 입력란 기본값으로
+  const { data: qs } = await SB.from('quarters').select('*').eq('game_id', g.id).order('quarter_number');
+  const last = qs && qs.length ? qs[qs.length - 1] : null;
+  const curA = last ? last.score_a : 0;
+  const curB = last ? last.score_b : 0;
 
   container.innerHTML = `
     <div class="card">
@@ -967,84 +1152,56 @@ function renderActiveGame(container) {
       </div>
     </div>
 
-    <!-- 쿼터 점수 입력 -->
+    <!-- 총 점수 입력 -->
     <div class="card" style="margin-bottom:12px">
       <div class="quarter-input-wrap">
-        <div class="quarter-badge" id="qBadge">${currentQuarter}쿼터 점수 입력</div>
+        <div class="quarter-badge">최종 점수 입력</div>
         <div class="q-score-inputs">
           <div>
             <div style="font-size:11px;color:#e94560;margin-bottom:4px">${g.team_a_name}</div>
-            <input type="number" id="inputA" value="0" min="0" style="color:#e94560">
+            <input type="number" id="inputA" value="${curA}" min="0" style="color:#e94560">
           </div>
           <span class="sep">:</span>
           <div>
             <div style="font-size:11px;color:#4a9eff;margin-bottom:4px">${g.team_b_name}</div>
-            <input type="number" id="inputB" value="0" min="0" style="color:#4a9eff">
+            <input type="number" id="inputB" value="${curB}" min="0" style="color:#4a9eff">
           </div>
         </div>
         <div class="row wrap mt10" style="justify-content:center;gap:8px">
-          <button class="btn btn-orange btn-lg" onclick="endQuarter()">✅ ${currentQuarter}쿼터 저장</button>
-          <button class="btn btn-gray" onclick="endGame()">🏁 게임 종료</button>
+          <button class="btn btn-orange btn-lg" onclick="saveScore(false)">💾 점수 저장</button>
+          <button class="btn btn-green btn-lg" onclick="saveScore(true)">🏁 저장 & 종료</button>
         </div>
       </div>
-    </div>
-
-    <div id="liveQuarterLog" class="card"></div>`;
-
-  loadLiveQuarterLog();
+    </div>`;
 }
 
-async function loadLiveQuarterLog() {
-  if (!currentGame) return;
-  const { data } = await SB.from('quarters').select('*').eq('game_id', currentGame.id).order('quarter_number');
-  const el = document.getElementById('liveQuarterLog');
-  if (!el || !data || !data.length) return;
-  el.innerHTML = `<h3 style="margin-bottom:8px">저장된 쿼터 기록</h3>` +
-    data.map(q => `<div class="quarter-row">
-      <span class="q-label">${q.quarter_number}Q</span>
-      <span class="q-score a">${q.score_a}</span>
-      <span style="color:#555;margin:0 6px">:</span>
-      <span class="q-score b">${q.score_b}</span>
-    </div>`).join('');
-}
-
-// ========== SCORE ACTIONS ==========
-
-async function endQuarter() {
+// 진행중 게임의 현재 저장된 총점 로드용 (renderActiveGame에서 curA/curB 계산)
+async function saveScore(finish) {
   if (!currentGame) return;
   const sa = parseInt(document.getElementById('inputA').value) || 0;
   const sb = parseInt(document.getElementById('inputB').value) || 0;
-  if (!confirm(`${currentQuarter}쿼터 저장\n${currentGame.team_a_name} ${sa} : ${sb} ${currentGame.team_b_name}\n저장할까요?`)) return;
-  const { error } = await SB.from('quarters').insert({
-    game_id: currentGame.id, quarter_number: currentQuarter, score_a: sa, score_b: sb
-  });
+  // 게임당 1행(quarter_number=1)으로 총점 저장 (있으면 갱신, 없으면 삽입)
+  const { data: existing } = await SB.from('quarters').select('id').eq('game_id', currentGame.id).limit(1);
+  let error;
+  if (existing && existing.length) {
+    ({ error } = await SB.from('quarters').update({ score_a: sa, score_b: sb }).eq('id', existing[0].id));
+  } else {
+    ({ error } = await SB.from('quarters').insert({ game_id: currentGame.id, quarter_number: 1, score_a: sa, score_b: sb }));
+  }
   if (error) { toast('저장 실패: ' + error.message, '#c0392b'); return; }
-  toast(`✅ ${currentQuarter}Q 저장 완료`);
-  currentQuarter++;
-  // update UI
-  const qb = document.getElementById('qBadge');
-  if (qb) qb.textContent = currentQuarter + '쿼터 점수 입력';
-  const qBtn = document.querySelector('[onclick^="endQuarter"]');
-  if (qBtn) qBtn.textContent = `✅ ${currentQuarter}쿼터 저장`;
-  // reset inputs
-  const ia = document.getElementById('inputA'), ib = document.getElementById('inputB');
-  if (ia) ia.value = sa;  // 이전 점수를 기본값으로 (누적 기준)
-  if (ib) ib.value = sb;
-  loadLiveQuarterLog();
-}
-
-async function endGame() {
-  if (!currentGame) return;
-  if (!confirm(`게임을 종료할까요?`)) return;
-  await SB.from('games').update({ status: 'completed' }).eq('id', currentGame.id);
-  toast('🏁 게임 종료!');
-  currentGame = null; currentQuarter = 1;
-  renderScorePage();
+  if (finish) {
+    await SB.from('games').update({ status: 'completed' }).eq('id', currentGame.id);
+    toast('🏁 저장 & 종료 완료');
+    currentGame = null; currentQuarter = 1;
+    renderScorePage();
+  } else {
+    toast('💾 점수 저장됨');
+  }
 }
 
 function goLobby() {
   if (currentGame && confirm('게임이 진행중입니다. 목록으로 돌아갈까요?\n(게임은 진행중 상태로 유지됩니다)')) {
-    pauseTimer();
+    currentGame = null;
     renderLobby(document.getElementById('scoreContainer'));
   } else if (!currentGame) {
     renderLobby(document.getElementById('scoreContainer'));
@@ -1055,17 +1212,43 @@ function goLobby() {
 // ========== NEW GAME MODAL ==========
 let ngAttendees = [];      // roster pulled from 출석부 for the relevant session (+ loaded guests)
 let ngMode = 'manual';      // 'manual' | 'load'
+let ngPastMode = false;     // false=오늘 새 게임, true=지난 게임 등록
+let ngPastGames = [];       // 지난 게임 등록용 게임별 총점 [{a,b}, ...]
+
+// 특정 날짜의 참석자를 조회해 ngAttendees/ngAssign 자동 구성
+async function ngBuildRoster(attendDate) {
+  ngAssign = {};
+  const { data } = await SB.from('attendance').select('*')
+    .eq('session_date', attendDate).eq('status', '참석');
+  const goIds = new Set((data || []).map(v => v.member_id));
+  const attendMembers = members.filter(m => goIds.has(m.id));
+
+  if (attendMembers.length) {
+    ngAttendees = attendMembers.concat(teamGuests);
+    attendMembers.forEach(m => {
+      if (m.team === 'IN')  ngAssign[m.id] = 'A';
+      else if (m.team === 'OUT') ngAssign[m.id] = 'B';
+    });
+  } else {
+    const assigned = members.filter(m => m.team === 'IN' || m.team === 'OUT');
+    ngAttendees = (assigned.length ? assigned : members.slice()).concat(teamGuests);
+    assigned.forEach(m => { ngAssign[m.id] = m.team === 'IN' ? 'A' : 'B'; });
+  }
+}
 
 async function openNewGameModal() {
-  ngAssign = {};
+  ngPastMode = false;
   ngMode = 'manual';
   const session = getRelevantSession();
-  const { data, error } = await SB.from('attendance').select('*')
-    .eq('session_date', session.date).in('status', ['참석','늦참']);
-  if (error) { toast('출석 정보 로드 실패: ' + error.message, '#c0392b'); return; }
-  const goIds = new Set((data || []).map(v => v.member_id));
-  ngAttendees = members.filter(m => goIds.has(m.id));
-  if (!ngAttendees.length) { toast(`${session.label} 출석 투표에서 참석/늦참으로 투표한 인원이 없습니다`, '#c0392b'); return; }
+  await ngBuildRoster(session.date);
+
+  document.getElementById('ngTitle').textContent = '🏀 새 게임 설정';
+  document.getElementById('ngDateWrap').style.display = 'none';
+  document.getElementById('ngQuarterWrap').style.display = 'none';
+  document.getElementById('ngRosterHint').textContent = '✅ 출석자는 고정 팀(IN·OUT)으로 자동 배정됩니다. 필요 시 아래에서 변경하세요.';
+  document.getElementById('ngSubmitBtn').textContent = '게임 시작';
+  document.getElementById('ngNameA').value = 'IN';
+  document.getElementById('ngNameB').value = 'OUT';
   document.getElementById('ngError').textContent = '';
   document.getElementById('ngModeManualBtn').className = 'btn btn-sm btn-blue';
   document.getElementById('ngModeLoadBtn').className = 'btn btn-sm btn-gray';
@@ -1074,7 +1257,71 @@ async function openNewGameModal() {
   renderNgMembers();
   document.getElementById('newGameModal').classList.add('open');
 }
-function closeNewGameModal() { document.getElementById('newGameModal').classList.remove('open'); }
+
+// 지난 게임 등록 모달
+async function openPastGameModal() {
+  ngPastMode = true;
+  ngMode = 'manual';
+  // 기본 날짜: 가장 최근 지난 일요일(또는 오늘 이전 최근 목/일)
+  const def = getLastSessionDate();
+  document.getElementById('ngDate').value = def;
+  await ngBuildRoster(def);
+
+  ngPastGames = [{a:0,b:0}]; // 기본 1게임
+  document.getElementById('ngTitle').textContent = '📅 지난 게임 등록';
+  document.getElementById('ngDateWrap').style.display = '';
+  document.getElementById('ngQuarterWrap').style.display = '';
+  document.getElementById('ngRosterHint').textContent = '✅ 선택한 날짜의 참석자를 고정 팀으로 자동 배정합니다. 필요 시 변경하세요.';
+  document.getElementById('ngSubmitBtn').textContent = '지난 게임 저장';
+  document.getElementById('ngNameA').value = 'IN';
+  document.getElementById('ngNameB').value = 'OUT';
+  document.getElementById('ngError').textContent = '';
+  document.getElementById('ngModeManualBtn').className = 'btn btn-sm btn-blue';
+  document.getElementById('ngModeLoadBtn').className = 'btn btn-sm btn-gray';
+  document.getElementById('ngManualWrap').style.display = '';
+  document.getElementById('ngLoadSection').style.display = 'none';
+  renderNgMembers();
+  renderNgPastGames();
+  // 날짜 바꾸면 그 날짜 참석자로 다시 구성
+  document.getElementById('ngDate').onchange = async (e) => {
+    await ngBuildRoster(e.target.value);
+    renderNgMembers();
+  };
+  document.getElementById('newGameModal').classList.add('open');
+}
+
+// 오늘 기준 가장 최근 지난 목/일 세션 날짜
+function getLastSessionDate() {
+  const d = new Date(); d.setHours(0,0,0,0);
+  for (let i = 1; i <= 14; i++) {
+    d.setDate(d.getDate() - 1);
+    if (d.getDay() === 4 || d.getDay() === 0) return toISO(d);
+  }
+  return toISO(new Date());
+}
+
+// 지난 게임 등록: 게임별 총점 입력 렌더
+function renderNgPastGames() {
+  const wrap = document.getElementById('ngGamesInputs');
+  wrap.innerHTML = ngPastGames.map((q,i) => `
+    <div class="q-score-inputs" style="margin:6px 0;justify-content:flex-start;gap:8px">
+      <span style="width:52px;color:#f5a623;font-size:13px;font-weight:bold">G${i+1}</span>
+      <input type="number" min="0" value="${q.a}" style="width:60px;font-size:20px;color:#e94560"
+        oninput="ngPastGames[${i}].a=+this.value||0">
+      <span class="sep">:</span>
+      <input type="number" min="0" value="${q.b}" style="width:60px;font-size:20px;color:#4a9eff"
+        oninput="ngPastGames[${i}].b=+this.value||0">
+      ${ngPastGames.length>1?`<button class="btn btn-sm btn-gray" onclick="ngRemovePastGame(${i})" style="margin-left:4px">✕</button>`:''}
+    </div>`).join('');
+}
+function ngAddPastGame() { ngPastGames.push({a:0,b:0}); renderNgPastGames(); }
+function ngRemovePastGame(i) { if (ngPastGames.length<=1) return; ngPastGames.splice(i,1); renderNgPastGames(); }
+
+
+function closeNewGameModal() {
+  document.getElementById('newGameModal').classList.remove('open');
+  const dateEl = document.getElementById('ngDate'); if (dateEl) dateEl.onchange = null;
+}
 
 function ngSetMode(mode) {
   ngMode = mode;
@@ -1087,34 +1334,39 @@ function ngSetMode(mode) {
 
 function renderNgLoadSection() {
   const wrap = document.getElementById('ngLoadSection');
-  if (!lastTeams.length) {
-    wrap.innerHTML = '<p class="text-sm" style="padding:8px 0">저장된 팀 편성 결과가 없습니다. 팀편성 탭에서 먼저 팀을 나눠주세요.</p>';
+  const inCnt  = members.filter(m => m.team === 'IN').length;
+  const outCnt = members.filter(m => m.team === 'OUT').length;
+  if (!inCnt && !outCnt) {
+    wrap.innerHTML = '<p class="text-sm" style="padding:8px 0">배정된 팀이 없습니다. 팀편성 탭에서 IN·OUT 팀을 먼저 배정하세요.</p>';
     return;
   }
-  const opts = lastTeams.map((t, i) => `<option value="${i}">팀 ${i + 1} (${t.length}명)</option>`).join('');
   wrap.innerHTML = `
-    <p class="text-sm">최근 팀 편성 결과에서 두 팀을 골라 A/B로 불러옵니다</p>
-    <div class="row mt6" style="gap:6px;">
-      <select id="ngLoadA">${opts}</select>
-      <select id="ngLoadB">${opts}</select>
-      <button class="btn btn-sm btn-red" onclick="ngApplyLoad()">불러오기</button>
-    </div>`;
-  if (lastTeams.length > 1) document.getElementById('ngLoadB').selectedIndex = 1;
+    <p class="text-sm">팀편성 탭에서 배정한 <b style="color:#e94560">IN</b> / <b style="color:#4a9eff">OUT</b> 명단을 그대로 불러옵니다.</p>
+    <p class="text-sm mt6">🔴 IN ${inCnt}명 · 🔵 OUT ${outCnt}명</p>
+    <div class="cb-row mt6" style="margin:0"><input type="checkbox" id="ngLoadAttendOnly"><span>이번 세션 출석자만 불러오기</span></div>
+    <button class="btn btn-sm btn-red mt10" onclick="ngApplyLoad()">불러오기</button>`;
 }
 
-function ngApplyLoad() {
-  const ai = +document.getElementById('ngLoadA').value;
-  const bi = +document.getElementById('ngLoadB').value;
-  if (ai === bi) { toast('A팀과 B팀은 다르게 선택하세요', '#c0392b'); return; }
-  const teamA = lastTeams[ai] || [];
-  const teamB = lastTeams[bi] || [];
+async function ngApplyLoad() {
+  let allowIds = null;
+  if (document.getElementById('ngLoadAttendOnly') && document.getElementById('ngLoadAttendOnly').checked) {
+    const session = getRelevantSession();
+    const { data } = await SB.from('attendance').select('*')
+      .eq('session_date', session.date).eq('status', '참석');
+    allowIds = new Set((data || []).map(v => v.member_id));
+  }
+  const teamA = members.filter(m => m.team === 'IN'  && (!allowIds || allowIds.has(m.id)));
+  const teamB = members.filter(m => m.team === 'OUT' && (!allowIds || allowIds.has(m.id)));
+  if (!teamA.length && !teamB.length) { toast('불러올 인원이 없습니다', '#c0392b'); return; }
   ngAssign = {};
   [...teamA, ...teamB].forEach(m => {
     if (!ngAttendees.some(a => a.id === m.id)) ngAttendees.push(m);
   });
   teamA.forEach(m => ngAssign[m.id] = 'A');
   teamB.forEach(m => ngAssign[m.id] = 'B');
-  toast('✅ 팀 편성 결과를 불러왔습니다');
+  document.getElementById('ngNameA').value = 'IN';
+  document.getElementById('ngNameB').value = 'OUT';
+  toast('✅ IN·OUT 팀을 불러왔습니다');
   ngSetMode('manual');
   renderNgMembers();
 }
@@ -1123,12 +1375,15 @@ function renderNgMembers() {
   const att = ngAttendees;
   document.getElementById('ngMemberList').innerHTML = att.map(m => {
     const assigned = ngAssign[m.id];
+    const fixed = m.team === 'IN' ? '<span class="badge b-공격">IN</span>'
+                : m.team === 'OUT' ? '<span class="badge b-수비">OUT</span>'
+                : m.is_guest ? '<span class="badge b-게스트">게스트</span>' : '';
     return `<div class="ng-member-row">
-      <span class="badge b-${m.level||'번개'}">${m.level}</span>
+      ${fixed || `<span class="badge b-${m.level||'번개'}">${m.level}</span>`}
       <span class="badge b-${m.is_center?'센터':m.position}">${m.is_center?'C':m.position}</span>
       <span class="ng-name">${m.name}</span>
-      <button class="btn btn-sm ${assigned==='A'?'btn-red':'btn-gray'}" onclick="ngSet('${m.id}','A')">A팀</button>
-      <button class="btn btn-sm ${assigned==='B'?'btn-blue':'btn-gray'}" onclick="ngSet('${m.id}','B')">B팀</button>
+      <button class="btn btn-sm ${assigned==='A'?'btn-red':'btn-gray'}" onclick="ngSet('${m.id}','A')">IN</button>
+      <button class="btn btn-sm ${assigned==='B'?'btn-blue':'btn-gray'}" onclick="ngSet('${m.id}','B')">OUT</button>
       ${assigned ? `<button class="btn btn-sm btn-gray" onclick="ngSet('${m.id}',null)">✕</button>` : '<span style="width:40px"></span>'}
     </div>`;
   }).join('');
@@ -1159,14 +1414,44 @@ async function createGame() {
     document.getElementById('ngError').textContent = '양 팀에 최소 1명씩 배정하세요';
     return;
   }
+  const nameA = document.getElementById('ngNameA').value || 'IN';
+  const nameB = document.getElementById('ngNameB').value || 'OUT';
+  const rosterA = teamA.map(m=>({id:m.id,name:m.name,level:m.level,position:m.position,is_center:m.is_center}));
+  const rosterB = teamB.map(m=>({id:m.id,name:m.name,level:m.level,position:m.position,is_center:m.is_center}));
+
+  if (ngPastMode) {
+    const gameDate = document.getElementById('ngDate').value;
+    if (!gameDate) { document.getElementById('ngError').textContent = '경기 날짜를 선택하세요'; return; }
+    // 그 날짜의 기존 게임 수 → 이어서 번호 부여
+    const { count } = await SB.from('games').select('id', {count:'exact',head:true}).eq('game_date', gameDate);
+    let n = (count || 0);
+    for (const gs of ngPastGames) {
+      n++;
+      const { data, error } = await SB.from('games').insert({
+        game_date: gameDate, game_number: n,
+        team_a_name: nameA, team_b_name: nameB,
+        team_a: rosterA, team_b: rosterB,
+        status: 'completed'
+      }).select().single();
+      if (error) { document.getElementById('ngError').textContent = error.message; return; }
+      const { error: qErr } = await SB.from('quarters').insert({
+        game_id: data.id, quarter_number: 1, score_a: +gs.a || 0, score_b: +gs.b || 0
+      });
+      if (qErr) { document.getElementById('ngError').textContent = '점수 저장 실패: ' + qErr.message; return; }
+    }
+    closeNewGameModal();
+    toast(`📅 지난 게임 ${ngPastGames.length}건 등록됨`);
+    renderScorePage();
+    return;
+  }
+
+  // 오늘 새 게임: active로 생성 후 진행화면(총점 입력)
   const { count } = await SB.from('games').select('id', {count:'exact',head:true}).eq('game_date', TODAY);
   const gameNumber = (count || 0) + 1;
   const { data, error } = await SB.from('games').insert({
     game_date: TODAY, game_number: gameNumber,
-    team_a_name: document.getElementById('ngNameA').value || '팀 A',
-    team_b_name: document.getElementById('ngNameB').value || '팀 B',
-    team_a: teamA.map(m=>({id:m.id,name:m.name,level:m.level,position:m.position,is_center:m.is_center})),
-    team_b: teamB.map(m=>({id:m.id,name:m.name,level:m.level,position:m.position,is_center:m.is_center})),
+    team_a_name: nameA, team_b_name: nameB,
+    team_a: rosterA, team_b: rosterB,
     status: 'active'
   }).select().single();
   if (error) { document.getElementById('ngError').textContent = error.message; return; }
