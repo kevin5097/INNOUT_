@@ -173,6 +173,7 @@ label { font-size: 12px; color: #8b95a5; display: block; margin-bottom: 3px; }
 .gch-team { font-weight: 700; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .gch-team.a { color: var(--in); text-align: right; }
 .gch-team.b { color: var(--out); text-align: left; }
+.gch-team.win { font-weight: 800; }
 .game-score-summary { font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums; display: inline-flex; align-items: baseline; gap: 6px; }
 .game-score-summary .sa { color: var(--in); }
 .game-score-summary .sb { color: var(--out); }
@@ -1213,6 +1214,9 @@ function renderGameCard(g) {
   const finalA = lastQ ? lastQ.score_a : 0;
   const finalB = lastQ ? lastQ.score_b : 0;
   const winner = finalA > finalB ? g.team_a_name : finalB > finalA ? g.team_b_name : '동점';
+  const decided = quarters.length > 0 && finalA !== finalB;
+  const aWin = decided && finalA > finalB;
+  const bWin = decided && finalB > finalA;
   const statusBadge = g.status === 'active'
     ? '<span class="badge b-active">진행중</span>'
     : '<span class="badge b-completed">종료</span>';
@@ -1226,9 +1230,9 @@ function renderGameCard(g) {
         <span class="gch-caret">▾</span>
       </div>
       <div class="gch-score">
-        <span class="gch-team a">${g.team_a_name}</span>
+        <span class="gch-team a ${aWin?'win':''}">${aWin?'🏆 ':''}${g.team_a_name}</span>
         <span class="game-score-summary"><span class="sa">${finalA}</span><span class="colon">:</span><span class="sb">${finalB}</span></span>
-        <span class="gch-team b">${g.team_b_name}</span>
+        <span class="gch-team b ${bWin?'win':''}">${g.team_b_name}${bWin?' 🏆':''}</span>
       </div>
     </div>
     <div class="game-card-body" id="gc${g.id}">
