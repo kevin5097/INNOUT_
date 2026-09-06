@@ -5,37 +5,64 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🏀 INNOUT 농구 동호회</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#e94560">
+<meta name="theme-color" content="#0e1117">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
+:root {
+  --bg: #0e1117;
+  --surface: #161b22;
+  --surface2: #1c232e;
+  --surface3: #232b37;
+  --border: #262d38;
+  --text: #e6eaf0;
+  --muted: #8b95a5;
+  --faint: #5b6472;
+  --in: #ff4757;      /* IN 팀 (레드) */
+  --out: #3b9eff;     /* OUT 팀 (블루) */
+  --accent: #ff8a3d;  /* 농구 오렌지 */
+  --win: #2ed573;
+  --radius: 14px;
+  --radius-sm: 10px;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; color: #eee; min-height: 100vh; }
+body { font-family: 'Pretendard Variable', Pretendard, -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; }
 
-nav { background: #16213e; display: flex; justify-content: center; gap: 4px; padding: 10px; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid #e94560; flex-wrap: wrap; }
-nav button { background: transparent; color: #aaa; border: none; padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 14px; transition: all .2s; }
-nav button.active { background: #e94560; color: #fff; font-weight: bold; }
+.app-title { text-align: center; padding: 16px 10px 8px; font-size: 22px; font-weight: 900; letter-spacing: -0.03em; }
+.app-title .t-in  { color: var(--in); }
+.app-title .t-n   { color: var(--text); }
+.app-title .t-out { color: var(--out); }
+.app-title .t-sub { color: var(--muted); font-size: 15px; font-weight: 700; margin-left: 4px; }
+nav { background: rgba(14,17,23,.82); backdrop-filter: saturate(150%) blur(12px); -webkit-backdrop-filter: saturate(150%) blur(12px); display: flex; justify-content: center; gap: 2px; padding: 8px 6px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+nav button { background: transparent; color: var(--muted); border: none; padding: 8px 13px; border-radius: 999px; cursor: pointer; font-size: 13.5px; font-weight: 600; transition: color .15s, background .15s; }
+nav button:hover { color: var(--text); }
+nav button.active { background: var(--in); color: #fff; font-weight: 700; box-shadow: 0 2px 12px rgba(255,71,87,.35); }
 
-.page { display: none; padding: 14px; max-width: 960px; margin: 0 auto; }
-.page.active { display: block; }
+.page { display: none; padding: 16px 14px 40px; max-width: 720px; margin: 0 auto; }
+.page.active { display: block; animation: pageIn .22s ease; }
+@keyframes pageIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-.card { background: #16213e; border-radius: 12px; padding: 16px; margin-bottom: 14px; }
-h2 { font-size: 17px; margin-bottom: 12px; color: #e94560; }
-h3 { font-size: 14px; margin-bottom: 6px; color: #f5a623; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
+h2 { font-size: 18px; font-weight: 800; margin-bottom: 12px; color: var(--text); letter-spacing: -0.02em; }
+h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: var(--accent); }
 
-input, select, textarea { background: #0f3460; border: 1px solid #333; color: #eee; padding: 8px 10px; border-radius: 8px; width: 100%; font-size: 14px; }
-input::placeholder { color: #555; }
-textarea { resize: vertical; min-height: 70px; }
+input, select, textarea { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: var(--radius-sm); width: 100%; font-size: 14px; font-family: inherit; transition: border-color .15s, box-shadow .15s; }
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--in); box-shadow: 0 0 0 3px rgba(255,71,87,.15); }
+input::placeholder { color: var(--faint); }
+textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
 
-.btn { padding: 8px 14px; border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; transition: opacity .15s; white-space: nowrap; }
-.btn:hover { opacity: .85; }
+.btn { padding: 9px 15px; border: none; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; font-weight: 700; font-family: inherit; transition: transform .1s, filter .15s; white-space: nowrap; letter-spacing: -0.01em; }
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: scale(.97); }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
-.btn-red    { background: #e94560; color: #fff; }
-.btn-blue   { background: #1a5296; color: #fff; border: 1px solid #4a9eff; }
-.btn-green  { background: #1e8449; color: #fff; }
-.btn-orange { background: #d68910; color: #fff; }
-.btn-gray   { background: #2c3e50; color: #eee; }
+.btn-red    { background: var(--in); color: #fff; }
+.btn-blue   { background: #1e3a5f; color: #fff; border: 1px solid var(--out); }
+.btn-green  { background: var(--win); color: #05210f; }
+.btn-orange { background: var(--accent); color: #241000; }
+.btn-gray   { background: #242b36; color: #e6eaf0; }
 .btn-sm     { padding: 4px 10px; font-size: 12px; }
 .btn-lg     { padding: 12px 24px; font-size: 15px; }
 
@@ -45,65 +72,65 @@ textarea { resize: vertical; min-height: 70px; }
 .mt10 { margin-top: 10px; }
 .mt14 { margin-top: 14px; }
 .tc   { text-align: center; }
-.text-sm  { font-size: 12px; color: #888; }
-.text-dim { color: #aaa; font-size: 13px; }
-.divider  { border: none; border-top: 1px solid #2a2a4e; margin: 12px 0; }
+.text-sm  { font-size: 12px; color: #6b7583; }
+.text-dim { color: #8b95a5; font-size: 13px; }
+.divider  { border: none; border-top: 1px solid #262d38; margin: 12px 0; }
 
-label { font-size: 12px; color: #aaa; display: block; margin-bottom: 3px; }
+label { font-size: 12px; color: #8b95a5; display: block; margin-bottom: 3px; }
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .form-grid .full { grid-column: 1 / -1; }
-.cb-row { display: flex; align-items: center; gap: 8px; background: #0f3460; border: 1px solid #333; border-radius: 8px; padding: 8px 10px; }
-.cb-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #e94560; cursor: pointer; flex-shrink: 0; }
+.cb-row { display: flex; align-items: center; gap: 8px; background: #1c232e; border: 1px solid #2a323d; border-radius: 8px; padding: 8px 10px; }
+.cb-row input[type=checkbox] { width: 18px; height: 18px; accent-color: #ff4757; cursor: pointer; flex-shrink: 0; }
 
 /* BADGE */
-.badge { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 11px; font-weight: bold; }
-.b-불꽃  { background: #c0392b; color: #fff; }
-.b-번개  { background: #d68910; color: #fff; }
-.b-새싹  { background: #1e8449; color: #fff; }
-.b-앞선  { background: #6c3483; color: #fff; }
-.b-뒷선  { background: #1a5276; color: #fff; }
-.b-센터  { background: #935116; color: #fff; }
-.b-게스트 { background: #555; color: #fff; }
-.b-공격  { background: #c0392b; color: #fff; }
-.b-수비  { background: #1a5276; color: #fff; }
-.b-active    { background: #1e8449; color: #fff; }
-.b-completed { background: #555; color: #ddd; }
+.badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: -0.01em; }
+.b-불꽃  { background: rgba(255,71,87,.16);  color: #ff8087; }
+.b-번개  { background: rgba(255,138,61,.16); color: #ffab6b; }
+.b-새싹  { background: rgba(46,213,115,.16); color: #5be59a; }
+.b-앞선  { background: rgba(168,85,247,.16); color: #c99bf5; }
+.b-뒷선  { background: rgba(59,158,255,.16); color: #7bc0ff; }
+.b-센터  { background: rgba(255,138,61,.16); color: #ffab6b; }
+.b-게스트 { background: rgba(139,149,165,.18); color: #b3bccb; }
+.b-공격  { background: rgba(255,71,87,.16);  color: #ff8087; }
+.b-수비  { background: rgba(59,158,255,.16); color: #7bc0ff; }
+.b-active    { background: rgba(46,213,115,.18); color: #5be59a; }
+.b-completed { background: rgba(139,149,165,.16); color: #9aa4b3; }
 
 /* MEMBER PAGE */
 .member-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
 
-.date-chip { background: #0f3460; border: 1px solid #2a3a5e; color: #ccc; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; text-align: center; white-space: nowrap; }
-.date-chip.active { background: #e94560; border-color: #e94560; color: #fff; font-weight: bold; }
-.date-chip .dc-sub { font-size: 11px; color: #888; margin-top: 2px; }
+.date-chip { background: #1c232e; border: 1px solid #262d38; color: #ccc; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 13px; text-align: center; white-space: nowrap; }
+.date-chip.active { background: #ff4757; border-color: #ff4757; color: #fff; font-weight: bold; }
+.date-chip .dc-sub { font-size: 11px; color: #6b7583; margin-top: 2px; }
 .date-chip.active .dc-sub { color: #ffd; }
 .date-chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
-.attend-row { background: #0f3460; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.attend-row { background: #1c232e; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
 .attend-name { font-weight: bold; font-size: 14px; }
-.attend-meta { font-size: 11px; color: #888; margin-top: 2px; }
+.attend-meta { font-size: 11px; color: #6b7583; margin-top: 2px; }
 .attend-btns { display: flex; gap: 6px; flex-shrink: 0; flex-wrap: wrap; }
-.av-btn { padding: 6px 10px; border-radius: 8px; border: 1px solid #333; background: #1a1a2e; color: #aaa; font-size: 12px; font-weight: bold; cursor: pointer; }
-.av-btn.go.sel  { background: #1e8449; color: #fff; border-color: #1e8449; }
+.av-btn { padding: 6px 10px; border-radius: 8px; border: 1px solid #2a323d; background: #0e1117; color: #8b95a5; font-size: 12px; font-weight: bold; cursor: pointer; }
+.av-btn.go.sel  { background: #1e9e57; color: #fff; border-color: #1e9e57; }
 .av-btn.no.sel  { background: #c0392b; color: #fff; border-color: #c0392b; }
-.av-btn.maybe.sel { background: #d68910; color: #fff; border-color: #d68910; }
-.av-btn.late.sel  { background: #4a9eff; color: #fff; border-color: #4a9eff; }
+.av-btn.maybe.sel { background: #ff8a3d; color: #fff; border-color: #ff8a3d; }
+.av-btn.late.sel  { background: #3b9eff; color: #fff; border-color: #3b9eff; }
 .attend-summary { display: flex; gap: 14px; font-size: 13px; }
 .attend-summary b { font-size: 16px; }
 .hist-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.hist-table th, .hist-table td { padding: 7px 8px; text-align: center; border-bottom: 1px solid #2a3a5e; }
-.hist-table th { color: #f5a623; font-size: 12px; }
+.hist-table th, .hist-table td { padding: 7px 8px; text-align: center; border-bottom: 1px solid #262d38; }
+.hist-table th { color: #ff8a3d; font-size: 12px; }
 .hist-table td:first-child, .hist-table th:first-child { text-align: left; }
-.hist-bar-wrap { background: #1a1a2e; border-radius: 6px; height: 8px; width: 70px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right:6px; }
+.hist-bar-wrap { background: #0e1117; border-radius: 6px; height: 8px; width: 70px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right:6px; }
 
-.video-row { display: flex; align-items: center; gap: 12px; background: #0f3460; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+.video-row { display: flex; align-items: center; gap: 12px; background: #1c232e; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
 .video-thumb { width: 100px; height: 56px; border-radius: 6px; background: #000 center/cover no-repeat; flex-shrink: 0; cursor: pointer; position: relative; }
 .video-thumb::after { content: '▶'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 18px; text-shadow: 0 0 4px #000; }
 .video-info { flex: 1; min-width: 0; }
-.video-date { font-size: 12px; color: #f5a623; font-weight: bold; }
+.video-date { font-size: 12px; color: #ff8a3d; font-weight: bold; }
 .video-title { font-size: 14px; font-weight: bold; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.hist-bar { background: #e94560; height: 100%; }
-.member-card { background: #0f3460; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; }
-.member-card.on { border-color: #e94560; }
-.mc-check { width: 20px; height: 20px; accent-color: #e94560; cursor: pointer; flex-shrink: 0; }
+.hist-bar { background: #ff4757; height: 100%; }
+.member-card { background: #1c232e; border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; }
+.member-card.on { border-color: #ff4757; }
+.mc-check { width: 20px; height: 20px; accent-color: #ff4757; cursor: pointer; flex-shrink: 0; }
 .mc-info  { flex: 1; min-width: 0; }
 .mc-name  { font-weight: bold; font-size: 15px; }
 .mc-badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
@@ -111,146 +138,165 @@ label { font-size: 12px; color: #aaa; display: block; margin-bottom: 3px; }
 
 /* SCORE PAGE */
 .score-main { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: start; }
-.score-panel { background: #0f3460; border-radius: 12px; padding: 14px; }
-.score-panel.pa { border-top: 4px solid #e94560; }
-.score-panel.pb { border-top: 4px solid #4a9eff; }
+.score-panel { background: #1c232e; border-radius: 12px; padding: 14px; }
+.score-panel.pa { border-top: 4px solid #ff4757; }
+.score-panel.pb { border-top: 4px solid #3b9eff; }
 .score-team-name { font-size: 17px; font-weight: bold; text-align: center; margin-bottom: 8px; }
-.score-num { font-size: 80px; font-weight: 900; line-height: 1; text-align: center; }
-.score-num.a { color: #e94560; }
-.score-num.b { color: #4a9eff; }
-.score-sep { font-size: 44px; color: #555; align-self: center; padding-top: 20px; }
+.score-num { font-size: 80px; font-weight: 900; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
+.score-num.a { color: #ff4757; }
+.score-num.b { color: #3b9eff; }
+.score-sep { font-size: 44px; color: #4a525e; align-self: center; padding-top: 20px; }
 .score-btns { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; margin-top: 8px; }
-.member-roster { margin-top: 10px; border-top: 1px solid #1a2a4e; padding-top: 8px; }
-.roster-item { font-size: 12px; color: #aaa; padding: 2px 0; display: flex; align-items: center; gap: 5px; }
+.member-roster { margin-top: 10px; border-top: 1px solid #262d38; padding-top: 8px; }
+.roster-item { font-size: 12px; color: #8b95a5; padding: 2px 0; display: flex; align-items: center; gap: 5px; }
 
 /* QUARTER INPUT */
-.quarter-input-wrap { background: #0f3460; border-radius: 12px; padding: 16px; text-align: center; }
-.quarter-badge { font-size: 22px; font-weight: bold; color: #4a9eff; margin-bottom: 10px; }
+.quarter-input-wrap { background: #1c232e; border-radius: 12px; padding: 16px; text-align: center; }
+.quarter-badge { font-size: 22px; font-weight: bold; color: #3b9eff; margin-bottom: 10px; }
 .q-score-inputs { display: flex; align-items: center; gap: 10px; justify-content: center; margin: 10px 0; }
 .q-score-inputs input { width: 72px; font-size: 32px; font-weight: 900; text-align: center; padding: 6px; }
-.q-score-inputs .sep { font-size: 28px; color: #555; }
+.q-score-inputs .sep { font-size: 28px; color: #4a525e; }
 
 /* LEVEL NOTICE */
 .level-notice { background: #2c1810; border: 1px solid #8b4513; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #f0a060; line-height: 1.6; }
 
 /* GAME HISTORY */
-.game-card { background: #0f3460; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-.game-card-header { padding: 12px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
-.game-card-header:hover { background: #1a3a5e; }
-.game-title { font-weight: bold; font-size: 15px; flex: 1; }
-.game-score-summary { font-size: 20px; font-weight: 900; }
-.game-card-body { padding: 0 14px 12px; display: none; }
+.game-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
+.game-card-header { padding: 12px 14px; cursor: pointer; }
+.game-card-header:hover { background: var(--surface3); }
+.gch-top { display: flex; align-items: center; gap: 8px; }
+.game-title { font-weight: 800; font-size: 14px; color: var(--muted); }
+.gch-del { margin-left: auto; background: transparent; border: none; cursor: pointer; font-size: 15px; padding: 2px 4px; opacity: .7; }
+.gch-del:hover { opacity: 1; }
+.gch-caret { font-size: 16px; color: var(--faint); }
+.gch-score { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-top: 8px; }
+.gch-team { font-weight: 700; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gch-team.a { color: var(--in); text-align: right; }
+.gch-team.b { color: var(--out); text-align: left; }
+.game-score-summary { font-size: 22px; font-weight: 900; font-variant-numeric: tabular-nums; display: inline-flex; align-items: baseline; gap: 6px; }
+.game-score-summary .sa { color: var(--in); }
+.game-score-summary .sb { color: var(--out); }
+.game-score-summary .colon { color: var(--faint); font-weight: 700; }
+.game-card-body { padding: 0 14px 14px; display: none; }
 .game-card-body.open { display: block; }
-.quarter-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #1a2a4e; font-size: 13px; }
+.quarter-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #262d38; font-size: 13px; }
 .quarter-row:last-child { border-bottom: none; }
-.q-label { width: 40px; color: #888; font-size: 12px; }
+.q-label { width: 40px; color: #6b7583; font-size: 12px; }
 .q-score { font-weight: bold; font-size: 14px; }
-.q-score.a { color: #e94560; }
-.q-score.b { color: #4a9eff; }
+.q-score.a { color: #ff4757; }
+.q-score.b { color: #3b9eff; }
 
 /* NEW GAME MODAL */
 .ng-member-list { max-height: 280px; overflow-y: auto; }
-.ng-member-row { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; background: #0f3460; margin-bottom: 5px; }
+.ng-member-row { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border-radius: 8px; background: #1c232e; margin-bottom: 5px; }
 .ng-name { flex: 1; font-size: 14px; font-weight: bold; }
 .ng-teams { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-.ng-team-box { background: #0f3460; border-radius: 8px; padding: 10px; min-height: 60px; }
-.ng-team-box.a { border-top: 3px solid #e94560; }
-.ng-team-box.b { border-top: 3px solid #4a9eff; }
-.ng-player-chip { display: inline-flex; align-items: center; gap: 4px; background: #1a3a5e; border-radius: 6px; padding: 3px 8px; font-size: 12px; margin: 3px 2px; cursor: pointer; }
+.ng-team-box { background: #1c232e; border-radius: 8px; padding: 10px; min-height: 60px; }
+.ng-team-box.a { border-top: 3px solid #ff4757; }
+.ng-team-box.b { border-top: 3px solid #3b9eff; }
+.ng-player-chip { display: inline-flex; align-items: center; gap: 4px; background: #232b37; border-radius: 6px; padding: 3px 8px; font-size: 12px; margin: 3px 2px; cursor: pointer; }
 .ng-player-chip:hover { background: #2a4a6e; }
 
 /* TACTICS */
-.tactic-item { background: #0f3460; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: background .15s; }
-.tactic-item:hover { background: #1a3a5e; }
+.tactic-item { background: #1c232e; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: background .15s; }
+.tactic-item:hover { background: #232b37; }
 .tactic-item h4 { font-size: 14px; margin-bottom: 4px; }
-.tactic-preview { font-size: 12px; color: #aaa; margin-top: 4px; }
+.tactic-preview { font-size: 12px; color: #8b95a5; margin-top: 4px; }
 
 /* TRAINING */
-.train-item { background: #0f3460; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: background .15s; }
-.train-item:hover { background: #1a3a5e; }
+.train-item { background: #1c232e; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: background .15s; }
+.train-item:hover { background: #232b37; }
 .train-item h4 { font-size: 15px; margin-bottom: 6px; }
-.train-preview { font-size: 12px; color: #aaa; margin-top: 6px; line-height: 1.5; }
+.train-preview { font-size: 12px; color: #8b95a5; margin-top: 6px; line-height: 1.5; }
 .train-meta { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; }
-.b-solo { background: #1e8449; color: #fff; }
-.b-duo  { background: #6c3483; color: #fff; }
-.b-cat  { background: #2c3e50; color: #cfe; }
-.b-vid  { background: #c0392b; color: #fff; }
+.b-solo { background: rgba(46,213,115,.16); color: #5be59a; }
+.b-duo  { background: rgba(168,85,247,.16); color: #c99bf5; }
+.b-cat  { background: rgba(139,149,165,.16); color: #b3bccb; }
+.b-vid  { background: rgba(255,71,87,.16); color: #ff8087; }
 .tv-embed { position: relative; width: 100%; padding-top: 56.25%; border-radius: 8px; overflow: hidden; background:#000; }
 .tv-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
 .canvas-toolbar { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
 .color-btn { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; flex-shrink: 0; }
 .color-btn.active { border-color: #fff; }
-.court-wrap { border-radius: 8px; overflow: hidden; border: 2px solid #333; background: #1a3a1a; }
+.court-wrap { border-radius: 8px; overflow: hidden; border: 2px solid #2a323d; background: #1a3a1a; }
 canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 
 /* MODAL */
-.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.78); z-index: 200; align-items: center; justify-content: center; padding: 12px; }
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.7); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 200; align-items: center; justify-content: center; padding: 12px; }
 .modal-overlay.open { display: flex; }
-.modal { background: #16213e; border-radius: 14px; padding: 20px; width: 100%; max-width: 560px; max-height: 92vh; overflow-y: auto; }
-.modal h3 { color: #e94560; margin-bottom: 14px; font-size: 16px; }
+.modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+.modal h3 { color: var(--text); margin-bottom: 14px; font-size: 17px; font-weight: 800; }
 
-.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e8449; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 999; display: none; }
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e9e57; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 999; display: none; }
 
 /* TEAM ASSIGN (IN/OUT) */
 .team-count-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-.tc-box { border-radius: 10px; padding: 10px; text-align: center; background: #0f3460; border: 1px solid #2a3a5e; }
-.tc-box.in  { border-top: 3px solid #e94560; }
-.tc-box.out { border-top: 3px solid #4a9eff; }
-.tc-box.na  { border-top: 3px solid #555; }
-.tc-box .tc-label { font-size: 12px; color: #aaa; }
+.tc-box { border-radius: 10px; padding: 10px; text-align: center; background: #1c232e; border: 1px solid #262d38; }
+.tc-box.in  { border-top: 3px solid #ff4757; }
+.tc-box.out { border-top: 3px solid #3b9eff; }
+.tc-box.na  { border-top: 3px solid #4a525e; }
+.tc-box .tc-label { font-size: 12px; color: #8b95a5; }
 .tc-box .tc-val { font-size: 26px; font-weight: 900; margin-top: 2px; }
-.tc-box.in  .tc-val { color: #e94560; }
-.tc-box.out .tc-val { color: #4a9eff; }
-.tc-box.na  .tc-val { color: #888; }
+.tc-box.in  .tc-val { color: #ff4757; }
+.tc-box.out .tc-val { color: #3b9eff; }
+.tc-box.na  .tc-val { color: #6b7583; }
 
-.ta-row { background: #0f3460; border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.ta-row.in  { border-left: 4px solid #e94560; }
-.ta-row.out { border-left: 4px solid #4a9eff; }
+.ta-row { background: #1c232e; border-radius: 10px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.ta-row.in  { border-left: 4px solid #ff4757; }
+.ta-row.out { border-left: 4px solid #3b9eff; }
 .ta-row.na  { border-left: 4px solid #444; }
 .ta-name { font-weight: bold; font-size: 14px; flex: 1; min-width: 0; }
 .ta-badges { display: flex; gap: 3px; flex-shrink: 0; }
 .ta-btns { display: flex; gap: 5px; flex-shrink: 0; }
-.ta-btn { padding: 5px 12px; border-radius: 8px; border: 1px solid #333; background: #1a1a2e; color: #aaa; font-size: 12px; font-weight: bold; cursor: pointer; }
-.ta-btn.in.sel  { background: #e94560; color: #fff; border-color: #e94560; }
-.ta-btn.out.sel { background: #4a9eff; color: #fff; border-color: #4a9eff; }
+.ta-btn { padding: 5px 12px; border-radius: 8px; border: 1px solid #2a323d; background: #0e1117; color: #8b95a5; font-size: 12px; font-weight: bold; cursor: pointer; }
+.ta-btn.in.sel  { background: #ff4757; color: #fff; border-color: #ff4757; }
+.ta-btn.out.sel { background: #3b9eff; color: #fff; border-color: #3b9eff; }
 .ta-group-title { font-size: 13px; font-weight: bold; margin: 12px 0 6px; padding-left: 2px; }
-.ta-group-title.in  { color: #e94560; }
-.ta-group-title.out { color: #4a9eff; }
-.ta-group-title.na  { color: #888; }
+.ta-group-title.in  { color: #ff4757; }
+.ta-group-title.out { color: #3b9eff; }
+.ta-group-title.na  { color: #6b7583; }
 
 /* RULEBOOK */
 .rulebook h2 { margin-bottom: 12px; }
 .rb-notice { background: #2c1810; border: 1px solid #8b4513; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #f0c090; line-height: 1.7; margin-bottom: 12px; }
 .rb-notice b { color: #ffcf9e; }
 .rb-lead { font-size: 13px; color: #ccc; margin-bottom: 14px; line-height: 1.6; }
-.rb-rule { display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid #2a2a4e; }
-.rb-num { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: #e94560; color: #fff; font-weight: 900; font-size: 15px; display: flex; align-items: center; justify-content: center; }
+.rb-rule { display: flex; gap: 12px; padding: 14px 0; border-top: 1px solid #262d38; }
+.rb-num { flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%; background: #ff4757; color: #fff; font-weight: 900; font-size: 15px; display: flex; align-items: center; justify-content: center; }
 .rb-body { flex: 1; min-width: 0; }
-.rb-body h4 { font-size: 15px; color: #f5a623; margin-bottom: 6px; }
-.rb-body p { font-size: 13.5px; color: #ddd; line-height: 1.7; margin-bottom: 4px; }
+.rb-body h4 { font-size: 15px; color: #ff8a3d; margin-bottom: 6px; }
+.rb-body p { font-size: 13.5px; color: #cfd6e0; line-height: 1.7; margin-bottom: 4px; }
 .rb-body p.rb-sub { color: #aab; font-size: 13px; }
 .rb-body b { color: #fff; }
 .rb-list { list-style: none; margin: 6px 0; padding: 0; }
-.rb-list li { font-size: 13.5px; color: #ddd; line-height: 1.7; padding-left: 16px; position: relative; }
-.rb-list li::before { content: '•'; position: absolute; left: 2px; color: #e94560; }
-.rb-ex { background: #0f3460; border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
-.rb-ex-title { font-size: 12.5px; color: #f5a623; font-weight: bold; margin-bottom: 6px; }
+.rb-list li { font-size: 13.5px; color: #cfd6e0; line-height: 1.7; padding-left: 16px; position: relative; }
+.rb-list li::before { content: '•'; position: absolute; left: 2px; color: #ff4757; }
+.rb-ex { background: #1c232e; border-radius: 8px; padding: 10px 12px; margin: 8px 0; }
+.rb-ex-title { font-size: 12.5px; color: #ff8a3d; font-weight: bold; margin-bottom: 6px; }
 .rb-ex-line { font-size: 13px; color: #ccc; line-height: 1.8; }
-.rb-score { background: #1a1a2e; border-radius: 6px; padding: 1px 8px; font-weight: bold; color: #fff; }
+.rb-score { background: #0e1117; border-radius: 6px; padding: 1px 8px; font-weight: bold; color: #fff; }
 
 @media (max-width: 520px) {
   .score-main { grid-template-columns: 1fr auto 1fr; }
-  .score-num { font-size: 58px; }
-  nav button { padding: 6px 10px; font-size: 12px; }
+  .score-num { font-size: 56px; }
+  nav { gap: 0; }
+  nav button { padding: 7px 9px; font-size: 12.5px; }
   .form-grid { grid-template-columns: 1fr; }
   .member-grid { grid-template-columns: 1fr; }
+  .gch-team { font-size: 13px; }
+  .game-score-summary { font-size: 20px; }
+  h2 { font-size: 17px; }
+}
+@media (max-width: 380px) {
+  nav button { padding: 6px 7px; font-size: 11.5px; }
+  .gch-team { font-size: 12px; }
 }
 </style>
 </head>
 <body>
 
-<div style="text-align:center;padding:14px 10px 4px;font-size:20px;font-weight:bold;color:#e94560">🏀 INNOUT 농구 동호회</div>
+<div class="app-title">🏀 <span class="t-in">IN</span><span class="t-n">N</span><span class="t-out">OUT</span> <span class="t-sub">농구 동호회</span></div>
 
 <nav>
   <button class="active" onclick="showPage('members',this)">👥 인원</button>
@@ -280,7 +326,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
       </div>
     </div>
     <button class="btn btn-red mt10" style="width:100%" onclick="addMember()" id="addBtn">+ 인원 추가</button>
-    <p style="color:#e94560;font-size:12px;margin-top:4px" id="addError"></p>
+    <p style="color:#ff4757;font-size:12px;margin-top:4px" id="addError"></p>
   </div>
   <div class="card">
     <div class="row wrap" style="justify-content:space-between;gap:8px;">
@@ -313,7 +359,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 <div id="page-teams" class="page">
   <div class="card">
     <h2>🎽 팀 편성 (IN · OUT)</h2>
-    <p class="text-sm">팀전용 고정 팀 편성입니다. 각 인원을 <b style="color:#e94560">IN</b> / <b style="color:#4a9eff">OUT</b> 팀으로 배정하세요. 배정 결과는 모든 기기에 공유됩니다.</p>
+    <p class="text-sm">팀전용 고정 팀 편성입니다. 각 인원을 <b style="color:#ff4757">IN</b> / <b style="color:#3b9eff">OUT</b> 팀으로 배정하세요. 배정 결과는 모든 기기에 공유됩니다.</p>
     <div class="team-count-row mt10" id="teamCountRow"></div>
   </div>
 
@@ -478,7 +524,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
       <div class="full"><label>유튜브 링크</label><input id="vidUrl" placeholder="https://youtube.com/watch?v=..."></div>
     </div>
     <button class="btn btn-red mt10" style="width:100%" onclick="addVideo()">+ 영상 추가</button>
-    <p style="color:#e94560;font-size:12px;margin-top:4px" id="vidError"></p>
+    <p style="color:#ff4757;font-size:12px;margin-top:4px" id="vidError"></p>
   </div>
   <div class="card">
     <h2>📺 영상 목록</h2>
@@ -495,8 +541,8 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
       <input id="ngDate" type="date" class="mt6">
     </div>
     <div class="row mt10">
-      <input id="ngNameA" value="IN" style="text-align:center;color:#e94560;font-weight:bold">
-      <input id="ngNameB" value="OUT" style="text-align:center;color:#4a9eff;font-weight:bold">
+      <input id="ngNameA" value="IN" style="text-align:center;color:#ff4757;font-weight:bold">
+      <input id="ngNameB" value="OUT" style="text-align:center;color:#3b9eff;font-weight:bold">
     </div>
     <div class="row mt10" style="gap:6px;">
       <button class="btn btn-sm btn-blue" id="ngModeManualBtn" onclick="ngSetMode('manual')">✍️ 직접 배정</button>
@@ -508,23 +554,23 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
       <div id="ngMemberList" class="ng-member-list mt6"></div>
       <div class="ng-teams mt10">
         <div class="ng-team-box a">
-          <div style="font-size:13px;color:#e94560;font-weight:bold;margin-bottom:6px">🔴 IN</div>
+          <div style="font-size:13px;color:#ff4757;font-weight:bold;margin-bottom:6px">🔴 IN</div>
           <div id="ngBoxA"></div>
         </div>
         <div class="ng-team-box b">
-          <div style="font-size:13px;color:#4a9eff;font-weight:bold;margin-bottom:6px">🔵 OUT</div>
+          <div style="font-size:13px;color:#3b9eff;font-weight:bold;margin-bottom:6px">🔵 OUT</div>
           <div id="ngBoxB"></div>
         </div>
       </div>
     </div>
     <div id="ngQuarterWrap" style="display:none">
       <hr class="divider">
-      <h3 style="color:#f5a623;font-size:14px">🏀 게임별 총 점수</h3>
+      <h3 style="color:#ff8a3d;font-size:14px">🏀 게임별 총 점수</h3>
       <p class="text-sm">이 날 진행한 게임들의 <b>최종 점수</b>를 게임 단위로 입력하세요. 팀 배정은 위 명단(IN·OUT)이 모든 게임에 공통 적용됩니다.</p>
       <div id="ngGamesInputs" class="mt6"></div>
       <button class="btn btn-sm btn-gray mt6" onclick="ngAddPastGame()">+ 게임 추가</button>
     </div>
-    <p style="color:#e94560;font-size:12px;margin-top:6px" id="ngError"></p>
+    <p style="color:#ff4757;font-size:12px;margin-top:6px" id="ngError"></p>
     <div class="row mt14">
       <button class="btn btn-red" id="ngSubmitBtn" onclick="createGame()">게임 시작</button>
       <button class="btn btn-gray" onclick="closeNewGameModal()">취소</button>
@@ -544,9 +590,9 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
       <h3>🏀 코트 그림판</h3>
       <div class="canvas-toolbar mt6">
         <div class="color-btn active" style="background:#fff"     data-c="#ffffff" onclick="setColor(this)"></div>
-        <div class="color-btn"        style="background:#e94560"  data-c="#e94560" onclick="setColor(this)"></div>
-        <div class="color-btn"        style="background:#4a9eff"  data-c="#4a9eff" onclick="setColor(this)"></div>
-        <div class="color-btn"        style="background:#f5a623"  data-c="#f5a623" onclick="setColor(this)"></div>
+        <div class="color-btn"        style="background:#ff4757"  data-c="#ff4757" onclick="setColor(this)"></div>
+        <div class="color-btn"        style="background:#3b9eff"  data-c="#3b9eff" onclick="setColor(this)"></div>
+        <div class="color-btn"        style="background:#ff8a3d"  data-c="#ff8a3d" onclick="setColor(this)"></div>
         <div class="color-btn"        style="background:#27ae60"  data-c="#27ae60" onclick="setColor(this)"></div>
         <input type="range" id="brushSize" min="2" max="20" value="4" style="width:56px">
         <button class="btn btn-sm btn-gray" onclick="toggleEraser()">🧹<span id="eraserLbl"> 지우개</span></button>
@@ -569,7 +615,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
       <button class="btn btn-sm btn-gray" onclick="closeTacticView()">✕</button>
     </div>
     <span id="vType" class="badge mt6"></span>
-    <p id="vDesc" style="margin-top:12px;white-space:pre-line;font-size:14px;color:#ddd;line-height:1.7"></p>
+    <p id="vDesc" style="margin-top:12px;white-space:pre-line;font-size:14px;color:#cfd6e0;line-height:1.7"></p>
     <img id="vImg" style="width:100%;border-radius:8px;margin-top:12px" alt="">
     <div class="row mt14">
       <button class="btn btn-orange" onclick="editTactic()">✏️ 수정</button>
@@ -599,7 +645,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
       <div class="full"><label>설명 (단계별)</label><textarea id="trDesc" placeholder="1. ...&#10;2. ..." style="min-height:100px"></textarea></div>
       <div class="full"><label>유튜브 링크 (선택)</label><input id="trVideo" placeholder="https://youtube.com/watch?v=..."></div>
     </div>
-    <p style="color:#e94560;font-size:12px;margin-top:6px" id="trError"></p>
+    <p style="color:#ff4757;font-size:12px;margin-top:6px" id="trError"></p>
     <div class="row mt14">
       <button class="btn btn-red" onclick="saveTrain()">저장</button>
       <button class="btn btn-gray" onclick="closeTrainModal()">취소</button>
@@ -616,11 +662,35 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
     </div>
     <div id="tvBadges" class="mt6" style="display:flex;gap:4px;flex-wrap:wrap"></div>
     <div id="tvSets" class="mt10 text-dim"></div>
-    <p id="tvDesc" style="margin-top:10px;white-space:pre-line;font-size:14px;color:#ddd;line-height:1.8"></p>
+    <p id="tvDesc" style="margin-top:10px;white-space:pre-line;font-size:14px;color:#cfd6e0;line-height:1.8"></p>
     <div id="tvVideo" class="mt10"></div>
     <div class="row mt14">
       <button class="btn btn-orange" onclick="editTrain()">✏️ 수정</button>
       <button class="btn btn-gray"   onclick="deleteTrain()">🗑 삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== 경기 기록 수정 모달 ========== -->
+<div class="modal-overlay" id="editGameModal">
+  <div class="modal">
+    <h3>✏️ 경기 기록 수정</h3>
+    <input type="hidden" id="egId">
+    <div class="form-grid">
+      <div class="full"><label>경기 날짜</label><input id="egDate" type="date"></div>
+      <div><label>IN 팀 이름</label><input id="egNameA" style="color:var(--in);font-weight:bold"></div>
+      <div><label>OUT 팀 이름</label><input id="egNameB" style="color:var(--out);font-weight:bold"></div>
+    </div>
+    <label class="mt10">최종 점수</label>
+    <div class="q-score-inputs" style="justify-content:flex-start;gap:10px">
+      <input type="number" id="egScoreA" min="0" style="width:70px;font-size:22px;color:var(--in)">
+      <span class="sep">:</span>
+      <input type="number" id="egScoreB" min="0" style="width:70px;font-size:22px;color:var(--out)">
+    </div>
+    <p style="color:var(--in);font-size:12px;margin-top:8px" id="egError"></p>
+    <div class="row mt14">
+      <button class="btn btn-red" onclick="saveEditGame()">저장</button>
+      <button class="btn btn-gray" onclick="closeEditGame()">취소</button>
     </div>
   </div>
 </div>
@@ -678,7 +748,7 @@ function showPage(id, btn) {
 }
 
 // ========== TOAST ==========
-function toast(msg, color = '#1e8449') {
+function toast(msg, color = '#1e9e57') {
   const t = document.getElementById('toast');
   t.textContent = msg; t.style.background = color; t.style.display = 'block';
   clearTimeout(t._t); t._t = setTimeout(() => t.style.display = 'none', 2400);
@@ -836,8 +906,8 @@ function renderAttendSummary() {
   const go = attendVotes.filter(v => v.status === '참석').length;
   const pending = members.length - go;
   document.getElementById('attendSummary').innerHTML = `
-    <span>✅ 참석 <b style="color:#1e8449">${go}</b></span>
-    <span>⬜ 미참석 <b style="color:#888">${pending}</b></span>`;
+    <span>✅ 참석 <b style="color:#1e9e57">${go}</b></span>
+    <span>⬜ 미참석 <b style="color:#6b7583">${pending}</b></span>`;
 }
 
 function renderAttendList() {
@@ -867,7 +937,7 @@ async function castVote(memberId, status) {
     const { error } = await SB.from('attendance').delete()
       .eq('session_date', currentAttendDate).eq('member_id', memberId);
     if (error) { toast('취소 실패: ' + error.message, '#c0392b'); return; }
-    toast('참석 취소됨', '#555');
+    toast('참석 취소됨', '#4a525e');
     await selectAttendDate(currentAttendDate);
     return;
   }
@@ -893,7 +963,7 @@ function renderAttendHistory() {
   const table = document.getElementById('attendHistTable');
   const totalSessions = new Set(attendAllRows.map(r => r.session_date)).size;
   if (!totalSessions || !members.length) {
-    table.innerHTML = `<tr><td style="padding:16px;text-align:center;color:#888">아직 투표 기록이 없습니다</td></tr>`;
+    table.innerHTML = `<tr><td style="padding:16px;text-align:center;color:#6b7583">아직 투표 기록이 없습니다</td></tr>`;
     return;
   }
   const rows = members.map(m => {
@@ -1010,7 +1080,7 @@ async function setTeam(id, team) {
   m.team = next;                 // 로컬 상태 갱신
   renderTeamAssign();
   renderMembers();
-  toast(next ? `✅ ${m.name} → ${next}팀` : `${m.name} 배정 해제`, next ? '#1e8449' : '#555');
+  toast(next ? `✅ ${m.name} → ${next}팀` : `${m.name} 배정 해제`, next ? '#1e9e57' : '#4a525e');
 }
 
 // ========== VIDEOS ==========
@@ -1032,7 +1102,7 @@ function ytSearchUrl(q) {
 
 async function loadVideos() {
   const { data, error } = await SB.from('videos').select('*').order('game_date', { ascending: false });
-  if (error) { document.getElementById('videoList').innerHTML = `<p class="text-sm tc" style="padding:20px;color:#e94560">로드 실패: ${error.message}</p>`; return; }
+  if (error) { document.getElementById('videoList').innerHTML = `<p class="text-sm tc" style="padding:20px;color:#ff4757">로드 실패: ${error.message}</p>`; return; }
   videos = data || [];
   renderVideos();
 }
@@ -1127,7 +1197,7 @@ async function renderLobby(container) {
     ${pastDates.length ? `<div class="card" style="margin-top:6px"><h2 style="margin:0">📅 지난 게임</h2></div>` : ''}
     ${pastDates.map(d => `
       <div style="margin-bottom:4px">
-        <div class="text-sm" style="color:#f5a623;font-weight:bold;margin:8px 2px 4px">${fmtFullDate(d)}</div>
+        <div class="text-sm" style="color:#ff8a3d;font-weight:bold;margin:8px 2px 4px">${fmtFullDate(d)}</div>
         ${pastByDate[d].map(g => renderGameCard(g)).join('')}
       </div>`).join('')}`;
 }
@@ -1149,31 +1219,36 @@ function renderGameCard(g) {
 
   return `<div class="game-card">
     <div class="game-card-header" onclick="toggleGameCard('gc${g.id}')">
-      <div class="game-title">Game ${g.game_number}</div>
-      ${statusBadge}
-      <div style="display:flex;align-items:baseline;gap:6px;margin:0 8px;flex:1">
-        <span style="color:#e94560;font-weight:bold">${g.team_a_name}</span>
-        <span class="game-score-summary"><span style="color:#e94560">${finalA}</span> : <span style="color:#4a9eff">${finalB}</span></span>
-        <span style="color:#4a9eff;font-weight:bold">${g.team_b_name}</span>
+      <div class="gch-top">
+        <span class="game-title">Game ${g.game_number}</span>
+        ${statusBadge}
+        <button class="gch-del" onclick="event.stopPropagation();deleteGame(${g.id})" aria-label="삭제">🗑</button>
+        <span class="gch-caret">▾</span>
       </div>
-      <button class="btn btn-sm btn-gray" onclick="event.stopPropagation();deleteGame(${g.id})" style="color:#e94560;margin-right:4px">🗑</button>
-      <span style="font-size:18px">▾</span>
+      <div class="gch-score">
+        <span class="gch-team a">${g.team_a_name}</span>
+        <span class="game-score-summary"><span class="sa">${finalA}</span><span class="colon">:</span><span class="sb">${finalB}</span></span>
+        <span class="gch-team b">${g.team_b_name}</span>
+      </div>
     </div>
     <div class="game-card-body" id="gc${g.id}">
       ${quarters.length === 0 ? '<p class="text-sm" style="padding:4px 0">기록된 점수 없음</p>' : `
         <div style="text-align:center;padding:6px 0">
-          <span style="font-size:15px;color:#e94560;font-weight:bold">${g.team_a_name}</span>
-          <span style="font-size:26px;font-weight:900;margin:0 10px"><span style="color:#e94560">${finalA}</span> : <span style="color:#4a9eff">${finalB}</span></span>
-          <span style="font-size:15px;color:#4a9eff;font-weight:bold">${g.team_b_name}</span>
+          <span style="font-size:15px;color:#ff4757;font-weight:bold">${g.team_a_name}</span>
+          <span style="font-size:26px;font-weight:900;margin:0 10px"><span style="color:#ff4757">${finalA}</span> : <span style="color:#3b9eff">${finalB}</span></span>
+          <span style="font-size:15px;color:#3b9eff;font-weight:bold">${g.team_b_name}</span>
         </div>
-        <div style="text-align:center;font-size:13px;color:#aaa">
-          🏆 <strong style="color:${finalA>finalB?'#e94560':finalA<finalB?'#4a9eff':'#888'}">${winner}</strong>${finalA !== finalB ? ` · ${Math.abs(finalA-finalB)}점 차` : ''}
+        <div style="text-align:center;font-size:13px;color:#8b95a5">
+          🏆 <strong style="color:${finalA>finalB?'#ff4757':finalA<finalB?'#3b9eff':'#6b7583'}">${winner}</strong>${finalA !== finalB ? ` · ${Math.abs(finalA-finalB)}점 차` : ''}
         </div>`}
-      <div style="margin-top:8px;font-size:12px;color:#666">
+      <div style="margin-top:8px;font-size:12px;color:#5b6472">
         ${g.team_a_name}: ${Array.isArray(g.team_a) ? g.team_a.map(m=>m.name).join(', ') : ''}<br>
         ${g.team_b_name}: ${Array.isArray(g.team_b) ? g.team_b.map(m=>m.name).join(', ') : ''}
       </div>
-      ${g.status === 'active' ? `<button class="btn btn-sm btn-green mt6" onclick="resumeGame(${g.id})">▶ 점수 입력</button>` : ''}
+      <div class="row mt10" style="gap:6px">
+        ${g.status === 'active' ? `<button class="btn btn-sm btn-green" onclick="resumeGame(${g.id})">▶ 점수 입력</button>` : ''}
+        <button class="btn btn-sm btn-orange" onclick="openEditGame(${g.id})">✏️ 기록 수정</button>
+      </div>
     </div>
   </div>`;
 }
@@ -1184,11 +1259,61 @@ function toggleGameCard(id) {
 }
 
 async function deleteGame(id) {
-  if (!confirm('이 게임을 삭제할까요?\n(쿼터 기록도 함께 삭제됩니다)')) return;
+  if (!confirm('이 게임을 삭제할까요?\n(점수 기록도 함께 삭제됩니다)')) return;
   if (currentGame && currentGame.id === id) { currentGame = null; currentQuarter = 1; }
   const { error } = await SB.from('games').delete().eq('id', id);
   if (error) { toast('삭제 실패: ' + error.message, '#c0392b'); return; }
   toast('🗑 게임 삭제됨');
+  renderScorePage();
+}
+
+let egGame = null;
+async function openEditGame(id) {
+  const { data, error } = await SB.from('games').select('*, quarters(*)').eq('id', id).single();
+  if (error || !data) { toast('불러오기 실패', '#c0392b'); return; }
+  egGame = data;
+  const qs = (data.quarters || []).sort((a,b)=>a.quarter_number-b.quarter_number);
+  const last = qs[qs.length-1];
+  document.getElementById('egId').value = id;
+  document.getElementById('egDate').value = data.game_date;
+  document.getElementById('egNameA').value = data.team_a_name;
+  document.getElementById('egNameB').value = data.team_b_name;
+  document.getElementById('egScoreA').value = last ? last.score_a : 0;
+  document.getElementById('egScoreB').value = last ? last.score_b : 0;
+  document.getElementById('egError').textContent = '';
+  document.getElementById('editGameModal').classList.add('open');
+}
+function closeEditGame() { document.getElementById('editGameModal').classList.remove('open'); egGame = null; }
+
+async function saveEditGame() {
+  const id = document.getElementById('egId').value;
+  const gdate = document.getElementById('egDate').value;
+  if (!gdate) { document.getElementById('egError').textContent = '날짜를 입력하세요'; return; }
+  const sa = parseInt(document.getElementById('egScoreA').value) || 0;
+  const sb = parseInt(document.getElementById('egScoreB').value) || 0;
+  // 게임 정보 수정
+  const { error: gErr } = await SB.from('games').update({
+    game_date: gdate,
+    team_a_name: document.getElementById('egNameA').value || 'IN',
+    team_b_name: document.getElementById('egNameB').value || 'OUT'
+  }).eq('id', id);
+  if (gErr) { document.getElementById('egError').textContent = gErr.message; return; }
+  // 총점(quarter 1행) 수정 or 생성
+  const { data: existing } = await SB.from('quarters').select('id').eq('game_id', id).order('quarter_number');
+  let qErr;
+  if (existing && existing.length) {
+    // 첫 행만 총점으로 유지하고 나머지 행은 정리
+    ({ error: qErr } = await SB.from('quarters').update({ quarter_number:1, score_a: sa, score_b: sb }).eq('id', existing[0].id));
+    if (existing.length > 1) {
+      const extra = existing.slice(1).map(r=>r.id);
+      await SB.from('quarters').delete().in('id', extra);
+    }
+  } else {
+    ({ error: qErr } = await SB.from('quarters').insert({ game_id: id, quarter_number: 1, score_a: sa, score_b: sb }));
+  }
+  if (qErr) { document.getElementById('egError').textContent = '점수 저장 실패: ' + qErr.message; return; }
+  closeEditGame();
+  toast('✅ 기록 수정됨');
   renderScorePage();
 }
 
@@ -1214,7 +1339,7 @@ async function renderActiveGame(container) {
     <div class="card">
       <div class="row" style="justify-content:space-between;align-items:center">
         <button class="btn btn-sm btn-gray" onclick="goLobby()">← 목록</button>
-        <span style="font-weight:bold;color:#f5a623">Game ${g.game_number}</span>
+        <span style="font-weight:bold;color:#ff8a3d">Game ${g.game_number}</span>
         <span class="badge b-active">진행중</span>
       </div>
     </div>
@@ -1222,8 +1347,8 @@ async function renderActiveGame(container) {
     <!-- 팀 명단 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
       <div class="score-panel pa">
-        <div class="score-team-name" style="color:#e94560">${g.team_a_name}</div>
-        <div class="member-roster" style="margin-top:6px;padding-top:6px;border-top:1px solid #1a2a4e">
+        <div class="score-team-name" style="color:#ff4757">${g.team_a_name}</div>
+        <div class="member-roster" style="margin-top:6px;padding-top:6px;border-top:1px solid #262d38">
           ${teamA.map(m=>`<div class="roster-item">
             <span class="badge b-${m.is_center?'센터':m.position}" style="font-size:10px">${m.is_center?'C':m.position}</span>
             ${m.name}
@@ -1231,8 +1356,8 @@ async function renderActiveGame(container) {
         </div>
       </div>
       <div class="score-panel pb">
-        <div class="score-team-name" style="color:#4a9eff">${g.team_b_name}</div>
-        <div class="member-roster" style="margin-top:6px;padding-top:6px;border-top:1px solid #1a2a4e">
+        <div class="score-team-name" style="color:#3b9eff">${g.team_b_name}</div>
+        <div class="member-roster" style="margin-top:6px;padding-top:6px;border-top:1px solid #262d38">
           ${teamB.map(m=>`<div class="roster-item">
             <span class="badge b-${m.is_center?'센터':m.position}" style="font-size:10px">${m.is_center?'C':m.position}</span>
             ${m.name}
@@ -1247,13 +1372,13 @@ async function renderActiveGame(container) {
         <div class="quarter-badge">최종 점수 입력</div>
         <div class="q-score-inputs">
           <div>
-            <div style="font-size:11px;color:#e94560;margin-bottom:4px">${g.team_a_name}</div>
-            <input type="number" id="inputA" value="${curA}" min="0" style="color:#e94560">
+            <div style="font-size:11px;color:#ff4757;margin-bottom:4px">${g.team_a_name}</div>
+            <input type="number" id="inputA" value="${curA}" min="0" style="color:#ff4757">
           </div>
           <span class="sep">:</span>
           <div>
-            <div style="font-size:11px;color:#4a9eff;margin-bottom:4px">${g.team_b_name}</div>
-            <input type="number" id="inputB" value="${curB}" min="0" style="color:#4a9eff">
+            <div style="font-size:11px;color:#3b9eff;margin-bottom:4px">${g.team_b_name}</div>
+            <input type="number" id="inputB" value="${curB}" min="0" style="color:#3b9eff">
           </div>
         </div>
         <div class="row wrap mt10" style="justify-content:center;gap:8px">
@@ -1394,11 +1519,11 @@ function renderNgPastGames() {
   const wrap = document.getElementById('ngGamesInputs');
   wrap.innerHTML = ngPastGames.map((q,i) => `
     <div class="q-score-inputs" style="margin:6px 0;justify-content:flex-start;gap:8px">
-      <span style="width:52px;color:#f5a623;font-size:13px;font-weight:bold">G${i+1}</span>
-      <input type="number" min="0" value="${q.a}" style="width:60px;font-size:20px;color:#e94560"
+      <span style="width:52px;color:#ff8a3d;font-size:13px;font-weight:bold">G${i+1}</span>
+      <input type="number" min="0" value="${q.a}" style="width:60px;font-size:20px;color:#ff4757"
         oninput="ngPastGames[${i}].a=+this.value||0">
       <span class="sep">:</span>
-      <input type="number" min="0" value="${q.b}" style="width:60px;font-size:20px;color:#4a9eff"
+      <input type="number" min="0" value="${q.b}" style="width:60px;font-size:20px;color:#3b9eff"
         oninput="ngPastGames[${i}].b=+this.value||0">
       ${ngPastGames.length>1?`<button class="btn btn-sm btn-gray" onclick="ngRemovePastGame(${i})" style="margin-left:4px">✕</button>`:''}
     </div>`).join('');
@@ -1430,7 +1555,7 @@ function renderNgLoadSection() {
     return;
   }
   wrap.innerHTML = `
-    <p class="text-sm">팀편성 탭에서 배정한 <b style="color:#e94560">IN</b> / <b style="color:#4a9eff">OUT</b> 명단을 그대로 불러옵니다.</p>
+    <p class="text-sm">팀편성 탭에서 배정한 <b style="color:#ff4757">IN</b> / <b style="color:#3b9eff">OUT</b> 명단을 그대로 불러옵니다.</p>
     <p class="text-sm mt6">🔴 IN ${inCnt}명 · 🔵 OUT ${outCnt}명</p>
     <div class="cb-row mt6" style="margin:0"><input type="checkbox" id="ngLoadAttendOnly"><span>이번 세션 출석자만 불러오기</span></div>
     <button class="btn btn-sm btn-red mt10" onclick="ngApplyLoad()">불러오기</button>`;
@@ -1585,7 +1710,7 @@ function _d(ctx,x,y) { // defense X
 }
 function _b(ctx,x,y) { // ball
   ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);
-  ctx.fillStyle='#f5a623';ctx.fill();
+  ctx.fillStyle='#ff8a3d';ctx.fill();
   ctx.strokeStyle='#7b3800';ctx.lineWidth=1.5;ctx.stroke();
   ctx.strokeStyle='rgba(0,0,0,.35)';ctx.lineWidth=1;
   ctx.beginPath();ctx.moveTo(x-5,y);ctx.lineTo(x+5,y);ctx.stroke();
