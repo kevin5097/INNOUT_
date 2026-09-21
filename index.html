@@ -732,7 +732,7 @@ let painting = false, lx = 0, ly = 0;
 let canvasReady = false;
 let tacticFilter = 'all';
 
-const TODAY = new Date().toISOString().split('T')[0];
+const TODAY = toISO(new Date());
 
 // ========== NAV ==========
 function showPage(id, btn) {
@@ -1237,12 +1237,7 @@ function renderGameCard(g) {
     </div>
     <div class="game-card-body" id="gc${g.id}">
       ${quarters.length === 0 ? '<p class="text-sm" style="padding:4px 0">기록된 점수 없음</p>' : `
-        <div style="text-align:center;padding:6px 0">
-          <span style="font-size:15px;color:#ff4757;font-weight:bold">${g.team_a_name}</span>
-          <span style="font-size:26px;font-weight:900;margin:0 10px"><span style="color:#ff4757">${finalA}</span> : <span style="color:#3b9eff">${finalB}</span></span>
-          <span style="font-size:15px;color:#3b9eff;font-weight:bold">${g.team_b_name}</span>
-        </div>
-        <div style="text-align:center;font-size:13px;color:#8b95a5">
+        <div style="text-align:center;font-size:13px;color:#8b95a5;padding-top:4px">
           🏆 <strong style="color:${finalA>finalB?'#ff4757':finalA<finalB?'#3b9eff':'#6b7583'}">${winner}</strong>${finalA !== finalB ? ` · ${Math.abs(finalA-finalB)}점 차` : ''}
         </div>`}
       <div style="margin-top:8px;font-size:12px;color:#5b6472">
