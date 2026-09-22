@@ -353,10 +353,10 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 <div class="app-title">🏀 <span class="t-in">IN</span><span class="t-n">N</span><span class="t-out">OUT</span> <span class="t-sub">농구 동호회</span></div>
 
 <nav>
-  <button class="active" onclick="showPage('members',this)">👥 인원</button>
+  <button class="active" onclick="showPage('lineup',this)">🧑‍🤝‍🧑 라인업</button>
+  <button onclick="showPage('members',this)">👥 인원</button>
   <button onclick="showPage('attend',this)">🗳 출석부</button>
   <button onclick="showPage('teams',this)">🎽 팀편성</button>
-  <button onclick="showPage('lineup',this)">🧑‍🤝‍🧑 라인업</button>
   <button onclick="showPage('rulebook',this)">📖 룰북</button>
   <button onclick="showPage('score',this)">🏀 스코어</button>
   <button onclick="showPage('tactics',this)">📋 전술</button>
@@ -365,7 +365,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 </nav>
 
 <!-- ========== 1. 인원 ========== -->
-<div id="page-members" class="page active">
+<div id="page-members" class="page">
   <div class="card">
     <h2>👥 인원 등록</h2>
     <div class="form-grid">
@@ -440,7 +440,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 </div>
 
 <!-- ========== 2.3 라인업 ========== -->
-<div id="page-lineup" class="page">
+<div id="page-lineup" class="page active">
   <div id="seasonSummary"></div>
   <div class="card">
     <div class="row wrap" style="justify-content:space-between;align-items:center;gap:8px">
@@ -2537,7 +2537,10 @@ async function deleteTrain() {
 }
 
 // ========== INIT ==========
-loadMembers();
+(async () => {
+  await loadMembers();   // members(팀 배정 포함) 먼저 로드
+  initLineup();          // 첫 화면: 라인업 + 시즌 현황
+})();
 initTactics();
 renderTactics();
 initTraining();
