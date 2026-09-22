@@ -231,6 +231,25 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 
 .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e9e57; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 999; display: none; }
 
+/* LINEUP */
+.lu-count { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.lu-box { border-radius: var(--radius-sm); padding: 12px; text-align: center; background: var(--surface2); border: 1px solid var(--border); }
+.lu-box.in  { border-top: 3px solid var(--in); }
+.lu-box.out { border-top: 3px solid var(--out); }
+.lu-box .lu-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+.lu-box .lu-val { font-size: 30px; font-weight: 900; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.lu-box.in  .lu-val { color: var(--in); }
+.lu-box.out .lu-val { color: var(--out); }
+.lu-team-head { display: flex; align-items: baseline; gap: 8px; margin: 0 2px 8px; }
+.lu-team-head .lu-t { font-size: 16px; font-weight: 800; }
+.lu-team-head.in  .lu-t { color: var(--in); }
+.lu-team-head.out .lu-t { color: var(--out); }
+.lu-team-head .lu-n { font-size: 13px; color: var(--muted); }
+.lu-player { display: flex; align-items: center; gap: 8px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 9px 12px; margin-bottom: 6px; }
+.lu-player .lu-idx { width: 20px; color: var(--faint); font-size: 13px; font-weight: 700; text-align: center; }
+.lu-player .lu-pname { flex: 1; font-weight: 700; font-size: 14px; }
+.lu-empty { color: var(--muted); font-size: 13px; padding: 14px; text-align: center; }
+
 /* TEAM ASSIGN (IN/OUT) */
 .team-count-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .tc-box { border-radius: 10px; padding: 10px; text-align: center; background: #1c232e; border: 1px solid #262d38; }
@@ -303,6 +322,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
   <button class="active" onclick="showPage('members',this)">👥 인원</button>
   <button onclick="showPage('attend',this)">🗳 출석부</button>
   <button onclick="showPage('teams',this)">🎽 팀편성</button>
+  <button onclick="showPage('lineup',this)">🧑‍🤝‍🧑 라인업</button>
   <button onclick="showPage('rulebook',this)">📖 룰북</button>
   <button onclick="showPage('score',this)">🏀 스코어</button>
   <button onclick="showPage('tactics',this)">📋 전술</button>
@@ -383,6 +403,23 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
     </div>
     <div id="guestList" class="mt10"></div>
   </div>
+</div>
+
+<!-- ========== 2.3 라인업 ========== -->
+<div id="page-lineup" class="page">
+  <div class="card">
+    <div class="row wrap" style="justify-content:space-between;align-items:center;gap:8px">
+      <h2 style="margin:0">🧑‍🤝‍🧑 일요일 라인업</h2>
+      <button class="btn btn-sm btn-gray" onclick="renderLineup()">↻ 새로고침</button>
+    </div>
+    <p class="text-sm mt6">목요일에 체크한 출석을 반영해, 그 주 <b>일요일 참석자</b>를 IN·OUT 팀으로 나눠 보여줍니다.</p>
+    <div class="row mt10" style="gap:8px;align-items:center">
+      <label style="white-space:nowrap;margin:0">일요일 날짜</label>
+      <select id="lineupDate" onchange="renderLineup()" style="flex:1"></select>
+    </div>
+    <div class="lu-count mt10" id="lineupCount"></div>
+  </div>
+  <div id="lineupBody"></div>
 </div>
 
 <!-- ========== 2.5 룰북 ========== -->
@@ -745,6 +782,7 @@ function showPage(id, btn) {
   if (id === 'training') renderTraining();
   if (id === 'attend')  renderAttendPage();
   if (id === 'teams')   { renderTeamAssign(); renderGuestList(); }
+  if (id === 'lineup')  initLineup();
   if (id === 'videos')  loadVideos();
 }
 
@@ -875,6 +913,90 @@ function genUpcomingSessions(n = 6) {
     d.setDate(d.getDate() + 1);
   }
   return out;
+}
+
+// ========== LINEUP (일요일 팀별 라인업) ==========
+// 지난 4개 + 다가오는 4개 일요일 날짜 목록 (가까운 미래가 위)
+function genSundays(past = 4, future = 4) {
+  const today = new Date(); today.setHours(0,0,0,0);
+  // 이번 주(또는 다가오는) 일요일
+  const base = new Date(today);
+  base.setDate(base.getDate() + (today.getDay() === 0 ? 0 : 7 - today.getDay()));
+  const out = [];
+  for (let i = future; i >= -past; i--) {
+    const d = new Date(base);
+    d.setDate(d.getDate() + i * 7);
+    out.push({ date: toISO(d), label: fmtDate(d) });
+  }
+  return out;
+}
+
+let lineupSundays = [];
+function initLineup() {
+  lineupSundays = genSundays(4, 4).sort((a, b) => a.date.localeCompare(b.date)); // 과거→미래
+  const sel = document.getElementById('lineupDate');
+  // 오늘 이후 가장 가까운 일요일을 기본 선택
+  const today = toISO(new Date());
+  const upcoming = lineupSundays.find(s => s.date >= today);
+  const defaultDate = upcoming ? upcoming.date : lineupSundays[lineupSundays.length - 1].date;
+  sel.innerHTML = lineupSundays.map(s =>
+    `<option value="${s.date}" ${s.date === defaultDate ? 'selected' : ''}>${s.label}</option>`).join('');
+  renderLineup();
+}
+
+async function renderLineup() {
+  const sel = document.getElementById('lineupDate');
+  const date = sel && sel.value;
+  const body = document.getElementById('lineupBody');
+  const countEl = document.getElementById('lineupCount');
+  if (!date) return;
+
+  const { data, error } = await SB.from('attendance').select('*')
+    .eq('session_date', date).eq('status', '참석');
+  if (error) {
+    countEl.innerHTML = '';
+    body.innerHTML = `<div class="card lu-empty">출석 정보 로드 실패: ${error.message}</div>`;
+    return;
+  }
+  const goIds = new Set((data || []).map(v => v.member_id));
+  const attendees = members.filter(m => goIds.has(m.id));
+  const inList  = attendees.filter(m => m.team === 'IN');
+  const outList = attendees.filter(m => m.team === 'OUT');
+  const naList  = attendees.filter(m => m.team !== 'IN' && m.team !== 'OUT');
+
+  countEl.innerHTML = `
+    <div class="lu-box in"><div class="lu-label">🔴 IN 출석</div><div class="lu-val">${inList.length}</div></div>
+    <div class="lu-box out"><div class="lu-label">🔵 OUT 출석</div><div class="lu-val">${outList.length}</div></div>`;
+
+  const playerRow = (m, i) => `
+    <div class="lu-player">
+      <span class="lu-idx">${i + 1}</span>
+      <span class="lu-pname">${m.name}</span>
+      <span class="badge b-${m.is_center ? '센터' : m.position}">${m.is_center ? 'C' : m.position}</span>
+      <span class="badge b-${m.level || '번개'}">${m.level}</span>
+    </div>`;
+
+  const teamCard = (cls, title, list) => `
+    <div class="card">
+      <div class="lu-team-head ${cls}">
+        <span class="lu-t">${title}</span>
+        <span class="lu-n">${list.length}명</span>
+      </div>
+      ${list.length ? list.map(playerRow).join('') : '<div class="lu-empty">참석 인원 없음</div>'}
+    </div>`;
+
+  let html = teamCard('in', '🔴 IN', inList) + teamCard('out', '🔵 OUT', outList);
+  if (naList.length) {
+    html += `<div class="card">
+      <div class="lu-team-head"><span class="lu-t" style="color:var(--muted)">⬜ 팀 미배정</span><span class="lu-n">${naList.length}명</span></div>
+      <p class="text-sm" style="margin-bottom:8px">참석했지만 IN·OUT 배정이 안 된 인원입니다. 팀편성 탭에서 배정하세요.</p>
+      ${naList.map(playerRow).join('')}
+    </div>`;
+  }
+  if (!attendees.length) {
+    html = `<div class="card lu-empty">이 날짜에 참석 체크한 인원이 없습니다.<br>출석부 탭에서 참석을 먼저 체크하세요.</div>`;
+  }
+  body.innerHTML = html;
 }
 
 async function renderAttendPage() {
