@@ -231,6 +231,40 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 
 .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1e9e57; color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 999; display: none; }
 
+/* SEASON SUMMARY */
+.ss-hero { background: linear-gradient(135deg, var(--surface) 0%, var(--surface2) 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 16px; margin-bottom: 12px; }
+.ss-lead { text-align: center; font-size: 13px; color: var(--muted); font-weight: 700; margin-bottom: 12px; }
+.ss-lead b { color: var(--text); }
+.ss-scoreline { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; }
+.ss-side { text-align: center; }
+.ss-side .ss-team { font-size: 15px; font-weight: 800; }
+.ss-side.in  .ss-team { color: var(--in); }
+.ss-side.out .ss-team { color: var(--out); }
+.ss-side .ss-wins { font-size: 52px; font-weight: 900; line-height: 1; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.ss-side.in  .ss-wins { color: var(--in); }
+.ss-side.out .ss-wins { color: var(--out); }
+.ss-side .ss-unit { font-size: 12px; color: var(--muted); font-weight: 700; }
+.ss-side.lead .ss-wins { text-shadow: 0 0 22px currentColor; }
+.ss-vs { font-size: 15px; font-weight: 900; color: var(--faint); }
+.ss-verdict { text-align: center; margin-top: 12px; font-size: 15px; font-weight: 800; }
+.ss-detail { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+.ss-detail-title { font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 8px; }
+.ss-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.ss-table th { color: var(--muted); font-weight: 700; font-size: 11px; padding: 4px 6px; text-align: center; }
+.ss-table th:first-child { text-align: left; }
+.ss-table td { padding: 7px 6px; text-align: center; border-top: 1px solid var(--border); }
+.ss-table td:first-child { text-align: left; font-weight: 700; }
+.ss-table .cell-in  { color: var(--in); font-weight: 800; }
+.ss-table .cell-out { color: var(--out); font-weight: 800; }
+.ss-weeks { margin-top: 10px; }
+.ss-week { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 6px 0; border-top: 1px solid var(--border); }
+.ss-week .ss-wk-date { color: var(--muted); font-weight: 700; width: 92px; flex-shrink: 0; }
+.ss-week .ss-wk-games { color: var(--faint); font-size: 12px; margin-left: auto; font-variant-numeric: tabular-nums; }
+.ss-week .ss-wk-win { font-weight: 800; }
+.ss-week .ss-wk-win.in  { color: var(--in); }
+.ss-week .ss-wk-win.out { color: var(--out); }
+.ss-week .ss-wk-win.tie { color: var(--muted); }
+
 /* LINEUP */
 .lu-count { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .lu-box { border-radius: var(--radius-sm); padding: 12px; text-align: center; background: var(--surface2); border: 1px solid var(--border); }
@@ -407,12 +441,13 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 
 <!-- ========== 2.3 라인업 ========== -->
 <div id="page-lineup" class="page">
+  <div id="seasonSummary"></div>
   <div class="card">
     <div class="row wrap" style="justify-content:space-between;align-items:center;gap:8px">
       <h2 style="margin:0">🧑‍🤝‍🧑 일요일 라인업</h2>
       <button class="btn btn-sm btn-gray" onclick="renderLineup()">↻ 새로고침</button>
     </div>
-    <p class="text-sm mt6">일요일에 체크한 출석을 반영해, 그 주 <b>일요일 참석자</b>를 IN·OUT 팀으로 나눠 보여줍니다.</p>
+    <p class="text-sm mt6">목요일에 체크한 출석을 반영해, 그 주 <b>일요일 참석자</b>를 IN·OUT 팀으로 나눠 보여줍니다.</p>
     <div class="row mt10" style="gap:8px;align-items:center">
       <label style="white-space:nowrap;margin:0">일요일 날짜</label>
       <select id="lineupDate" onchange="renderLineup()" style="flex:1"></select>
@@ -941,7 +976,123 @@ function initLineup() {
   const defaultDate = upcoming ? upcoming.date : lineupSundays[lineupSundays.length - 1].date;
   sel.innerHTML = lineupSundays.map(s =>
     `<option value="${s.date}" ${s.date === defaultDate ? 'selected' : ''}>${s.label}</option>`).join('');
+  renderSeasonSummary();
   renderLineup();
+}
+
+// 시즌 현황: 하루(정모) 3게임 중 2게임 이긴 팀이 그 주 승리. IN vs OUT 누적.
+async function renderSeasonSummary() {
+  const el = document.getElementById('seasonSummary');
+  if (!el) return;
+  const { data: games, error } = await SB.from('games')
+    .select('*, quarters(*)')
+    .eq('status', 'completed')
+    .order('game_date').order('game_number');
+  if (error) { el.innerHTML = `<div class="card lu-empty">시즌 정보 로드 실패: ${error.message}</div>`; return; }
+
+  // 날짜별로 묶기
+  const byDate = {};
+  (games || []).forEach(g => {
+    const qs = (g.quarters || []).sort((a, b) => a.quarter_number - b.quarter_number);
+    const last = qs[qs.length - 1];
+    if (!last) return; // 점수 없는 게임 제외
+    (byDate[g.game_date] = byDate[g.game_date] || []).push({
+      num: g.game_number, in: last.score_a, out: last.score_b
+    });
+  });
+
+  const dates = Object.keys(byDate).sort();
+  let weekWinIn = 0, weekWinOut = 0, weekTie = 0;   // 주간 승리
+  let gameWinIn = 0, gameWinOut = 0, gameTie = 0;    // 총 게임 승패
+  let ptsIn = 0, ptsOut = 0;                          // 득점 합계
+  const weeks = [];
+
+  dates.forEach(d => {
+    const gl = byDate[d].sort((a, b) => a.num - b.num);
+    let wIn = 0, wOut = 0;
+    gl.forEach(g => {
+      ptsIn += g.in; ptsOut += g.out;
+      if (g.in > g.out) { wIn++; gameWinIn++; }
+      else if (g.out > g.in) { wOut++; gameWinOut++; }
+      else gameTie++;
+    });
+    let weekWinner;
+    if (wIn > wOut) { weekWinIn++; weekWinner = 'in'; }
+    else if (wOut > wIn) { weekWinOut++; weekWinner = 'out'; }
+    else { weekTie++; weekWinner = 'tie'; }
+    weeks.push({ date: d, wIn, wOut, games: gl.length, winner: weekWinner });
+  });
+
+  const diffIn = ptsIn - ptsOut;
+  const totalWeeks = dates.length;
+
+  if (!totalWeeks) {
+    el.innerHTML = `<div class="card lu-empty">아직 집계할 완료 경기가 없습니다.<br>스코어 탭에서 경기를 기록하면 여기 시즌 현황이 채워집니다.</div>`;
+    return;
+  }
+
+  // 리드 판정
+  const inLead = weekWinIn > weekWinOut;
+  const outLead = weekWinOut > weekWinIn;
+  const verdict = inLead
+    ? `<span style="color:var(--in)">🔴 IN</span> 팀이 <b>${weekWinIn}승 ${weekWinOut}패</b>로 앞서는 중`
+    : outLead
+      ? `<span style="color:var(--out)">🔵 OUT</span> 팀이 <b>${weekWinOut}승 ${weekWinIn}패</b>로 앞서는 중`
+      : `현재 <b>${weekWinIn} : ${weekWinOut}</b> 동률`;
+
+  const fmtWeek = iso => { const dd = new Date(iso + 'T00:00:00'); return `${dd.getMonth()+1}/${dd.getDate()}(${WD[dd.getDay()]})`; };
+  const recentWeeks = weeks.slice().reverse().slice(0, 6);
+
+  el.innerHTML = `
+    <div class="ss-hero">
+      <div class="ss-lead">🏆 팀전 시즌 현황 <b>· 주간 승리 기준</b> (하루 3게임 중 2승 = 그 주 승리)</div>
+      <div class="ss-scoreline">
+        <div class="ss-side in ${inLead ? 'lead' : ''}">
+          <div class="ss-team">🔴 IN</div>
+          <div class="ss-wins">${weekWinIn}</div>
+          <div class="ss-unit">주 승리</div>
+        </div>
+        <div class="ss-vs">VS</div>
+        <div class="ss-side out ${outLead ? 'lead' : ''}">
+          <div class="ss-team">OUT 🔵</div>
+          <div class="ss-wins">${weekWinOut}</div>
+          <div class="ss-unit">주 승리</div>
+        </div>
+      </div>
+      <div class="ss-verdict">${verdict}</div>
+
+      <div class="ss-detail">
+        <div class="ss-detail-title">세부 기록 (누적 ${totalWeeks}주 · 총 ${gameWinIn + gameWinOut + gameTie}게임)</div>
+        <table class="ss-table">
+          <tr><th>구분</th><th>주간 승</th><th>게임 승</th><th>득점</th><th>득실차</th></tr>
+          <tr>
+            <td>🔴 IN</td>
+            <td class="cell-in">${weekWinIn}</td>
+            <td class="cell-in">${gameWinIn}</td>
+            <td>${ptsIn}</td>
+            <td class="cell-in">${diffIn > 0 ? '+' : ''}${diffIn}</td>
+          </tr>
+          <tr>
+            <td>🔵 OUT</td>
+            <td class="cell-out">${weekWinOut}</td>
+            <td class="cell-out">${gameWinOut}</td>
+            <td>${ptsOut}</td>
+            <td class="cell-out">${-diffIn > 0 ? '+' : ''}${-diffIn}</td>
+          </tr>
+        </table>
+        ${weekTie ? `<p class="text-sm" style="margin-top:6px">무승부 주간: ${weekTie}주${gameTie ? ` · 무승부 게임: ${gameTie}` : ''}</p>` : ''}
+
+        <div class="ss-weeks">
+          <div class="ss-detail-title">주차별 결과 (최근순)</div>
+          ${recentWeeks.map(w => `
+            <div class="ss-week">
+              <span class="ss-wk-date">${fmtWeek(w.date)}</span>
+              <span class="ss-wk-win ${w.winner}">${w.winner === 'in' ? '🔴 IN 승' : w.winner === 'out' ? '🔵 OUT 승' : '무승부'}</span>
+              <span class="ss-wk-games">IN ${w.wIn} : ${w.wOut} OUT · ${w.games}게임</span>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
 }
 
 async function renderLineup() {
