@@ -288,6 +288,22 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 .best-team-btn, .best-mode-btn { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 .best-team-btn.sel { background: var(--surface3); color: var(--text); border-color: var(--muted); }
 .best-mode-btn.sel { background: var(--accent); color: #241000; border-color: var(--accent); }
+.rot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.rot-q { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; }
+.rot-qh { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 7px; }
+.rot-qn { font-weight: 900; font-size: 15px; color: var(--accent); }
+.rot-hole { font-size: 10.5px; color: var(--in); font-weight: 700; text-align: right; }
+.rot-ok { font-size: 10.5px; color: var(--win); font-weight: 700; }
+.rot-players { display: flex; flex-direction: column; gap: 3px; }
+.rot-p { font-size: 13px; font-weight: 700; display: flex; justify-content: space-between; gap: 6px; align-items: baseline; }
+.rot-pos { color: var(--muted); font-weight: 600; font-size: 10.5px; flex-shrink: 0; }
+.rot-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); }
+.rot-name { font-weight: 700; font-size: 14px; width: 80px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rot-qs { display: flex; gap: 4px; flex: 1; }
+.rot-chip { width: 24px; text-align: center; font-size: 11px; font-weight: 800; border-radius: 6px; padding: 3px 0; background: var(--surface3); color: var(--faint); }
+.rot-chip.on { background: var(--accent); color: #241000; }
+.rot-cnt { font-size: 12px; color: var(--muted); font-weight: 700; width: 46px; text-align: right; flex-shrink: 0; }
+.rot-row.low .rot-name { color: var(--in); }
 .best-slot { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 6px; }
 .best-slot .bs-name { font-weight: 800; font-size: 14px; }
 .best-slot .bs-sub { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 2px; }
@@ -385,7 +401,6 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 
 <nav>
   <button class="active" onclick="showPage('lineup',this)">🧑‍🤝‍🧑 라인업</button>
-  <button onclick="showPage('best',this)">⭐ 베스트5</button>
   <button onclick="showPage('members',this)">👥 인원</button>
   <button onclick="showPage('attend',this)">🗳 출석부</button>
   <button onclick="showPage('teams',this)">🎽 팀편성</button>
@@ -394,6 +409,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
   <button onclick="showPage('tactics',this)">📋 전술</button>
   <button onclick="showPage('training',this)">🏋️ 훈련</button>
   <button onclick="showPage('videos',this)">🎥 영상</button>
+  <button onclick="showPage('best',this)">⭐ 베스트5</button>
 </nav>
 
 <!-- ========== 1. 인원 ========== -->
@@ -517,13 +533,15 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
         <button class="btn btn-sm best-team-btn"     data-t="OUT" onclick="bestSetTeam('OUT',this)">🔵 OUT 팀</button>
       </div>
       <div class="row wrap mt6" style="gap:6px">
-        <button class="btn btn-sm best-mode-btn sel" data-m="best"    onclick="bestSetMode('best',this)">⭐ 화력 최대</button>
-        <button class="btn btn-sm best-mode-btn"     data-m="balance" onclick="bestSetMode('balance',this)">🛡 약점 최소</button>
+        <button class="btn btn-sm best-mode-btn sel" data-m="best"     onclick="bestSetMode('best',this)">⭐ 화력 최대</button>
+        <button class="btn btn-sm best-mode-btn"     data-m="balance"  onclick="bestSetMode('balance',this)">🛡 약점 최소</button>
+        <button class="btn btn-sm best-mode-btn"     data-m="rotation" onclick="bestSetMode('rotation',this)">🔄 쿼터 로테이션</button>
       </div>
       <div class="cb-row mt10" style="margin:0">
         <input type="checkbox" id="bestAttendOnly" onchange="renderBest()">
         <span>이번 일요일 참석자만 대상으로</span>
       </div>
+      <p class="text-sm mt6" id="bestModeHint"></p>
     </div>
 
     <div id="bestResult"></div>
@@ -1262,7 +1280,16 @@ function bestUnlock() {
 }
 function bestLock() { try { sessionStorage.removeItem('best_ok'); } catch(e){} initBest(); }
 function bestSetTeam(t, btn) { bestTeam=t; document.querySelectorAll('.best-team-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); renderBest(); }
-function bestSetMode(m, btn) { bestMode=m; document.querySelectorAll('.best-mode-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); renderBest(); }
+function bestSetMode(m, btn) {
+  bestMode=m;
+  document.querySelectorAll('.best-mode-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel');
+  const hint=document.getElementById('bestModeHint');
+  if (m==='rotation') {
+    document.getElementById('bestAttendOnly').checked = true;   // 로테이션은 참석자 기준
+    if (hint) hint.textContent='참석자 전원이 최소 2쿼터를 뛰도록, 각 쿼터의 약점이 가장 적게 4쿼터를 배정합니다.';
+  } else if (hint) hint.textContent='';
+  renderBest();
+}
 
 // ---- 데이터 헬퍼 ----
 function tierVal(level) { return level==='불꽃' ? 3 : level==='새싹' ? 1 : 2; }   // 종합 실력
@@ -1304,18 +1331,99 @@ function pickBest(pool, mode) {
     const posc = posCoverage3(five);
     const d = roleDepth(five);
     const minDepth = Math.min(...ROLE_TAGS.map(t=>d[t]));   // 모든 역할 최소 보유수(0이면 구멍)
+    const depthSum = ROLE_TAGS.reduce((s,t)=>s+d[t],0);    // 선발 총 역할 기여(유틸 총량, 태그 합)
+    const posFlex = five.reduce((s,m)=>s+posLabelsOf(m).length,0); // 겸임 유연성 합
     const holes = holesOf(five).length;
     let sc;
     if (mode==='balance') {
-      // 약점 최소: 구멍 최소 → 역할 커버 최대 → 균형(최소깊이) → 전력 → 포지션
-      sc = (-holes)*1e9 + cov*1e6 + minDepth*1e4 + str*100 + posc;
+      // 약점 최소: 구멍 최소 → 역할 커버 최대 → 균형(최소깊이) → 유틸 총량 → 겸임 유연성 → 전력
+      sc = (-holes)*1e11 + cov*1e9 + minDepth*1e7 + depthSum*1e4 + posFlex*1e2 + str;
     } else {
-      // 화력 최대: 전력 최대 → 구멍 최소 → 커버 → 포지션
-      sc = str*1e7 + (-holes)*1e5 + cov*1e3 + posc*10;
+      // 화력 최대: 전력 최대 → 구멍 최소 → 커버 → 유틸 총량 → 겸임 유연성 → 포지션
+      sc = str*1e11 + (-holes)*1e9 + cov*1e6 + depthSum*1e3 + posFlex*10 + posc;
     }
     if (sc>score){ score=sc; best=five; }
   });
   return best;
+}
+
+// ========== 쿼터 로테이션 (전원 최소 2쿼터 · 쿼터별 약점 최소) ==========
+function planRotation(pool) {
+  const N=pool.length, Q=4, ON=5, SLOTS=Q*ON;
+  if (N<5) return {error:`참석 5명 이상이어야 로테이션을 짤 수 있어요 (현재 ${N}명).`};
+  const util = m => tagsOf(m).length + posLabelsOf(m).length + tierVal(m.level);
+  const order = pool.map((m,i)=>i).sort((a,b)=>util(pool[b])-util(pool[a]));
+  let quotas, warn='';
+  if (N<=5) { quotas=pool.map(()=>Q); }                       // 5명 → 전원 풀쿼터(교체 없음)
+  else if (N<=10) {
+    quotas=pool.map(()=>2);                                   // 전원 2쿼터
+    let extra=SLOTS-2*N, oi=0;
+    while(extra>0){ const i=order[oi%N]; if(quotas[i]<Q){quotas[i]++;extra--;} oi++; if(oi>SLOTS*4)break; }
+  } else {
+    quotas=pool.map(()=>Math.floor(SLOTS/N));
+    let rem=SLOTS-quotas.reduce((a,b)=>a+b,0), oi=0;
+    while(rem>0){ const i=order[oi%N]; if(quotas[i]<Q){quotas[i]++;rem--;} oi++; if(oi>SLOTS*4)break; }
+    warn=`참석 ${N}명이라 출전 자리(20석)를 넘어, 일부는 1쿼터만 뜁니다 — 전원 2쿼터 룰을 다 못 채웁니다.`;
+  }
+  const lineups=Array.from({length:Q},()=>[]);
+  pool.map((m,i)=>i).sort((a,b)=>quotas[b]-quotas[a]).forEach(i=>{
+    let cnt=quotas[i];
+    const qs=[...Array(Q).keys()].sort((a,b)=>lineups[a].length-lineups[b].length);
+    for(const q of qs){ if(cnt<=0)break; if(lineups[q].length<ON && !lineups[q].includes(i)){ lineups[q].push(i); cnt--; } }
+  });
+  const fiveOf=q=>lineups[q].map(i=>pool[i]);
+  const cost=()=>lineups.reduce((s,_,q)=>s+holesOf(fiveOf(q)).length*100+(ROLE_TAGS.length-coveredCount(fiveOf(q))),0);
+  let improved=true, guard=0;
+  while(improved && guard++<3000){
+    improved=false; const base=cost();
+    outer:
+    for(let qa=0;qa<Q;qa++)for(let qb=qa+1;qb<Q;qb++){
+      for(let x=0;x<lineups[qa].length;x++)for(let y=0;y<lineups[qb].length;y++){
+        const pa=lineups[qa][x], pb=lineups[qb][y];
+        if(pa===pb||lineups[qa].includes(pb)||lineups[qb].includes(pa)) continue;
+        lineups[qa][x]=pb; lineups[qb][y]=pa;
+        if(cost()<base){ improved=true; break outer; }
+        lineups[qa][x]=pa; lineups[qb][y]=pb;
+      }
+    }
+  }
+  const perPlayer = pool.map((m,i)=>({m, qs: lineups.map((lu,q)=>lu.includes(i)?q+1:0).filter(Boolean)}));
+  return { quotas, lineups: lineups.map(lu=>lu.map(i=>pool[i])), perPlayer, warn };
+}
+
+function renderRotationHtml(pool, plan) {
+  if (plan.error) return `<div class="card lu-empty">${plan.error}</div>`;
+  const qCards = plan.lineups.map((five,qi)=>{
+    const holes=holesOf(five);
+    const names = five.slice().sort((a,b)=>tierVal(b.level)-tierVal(a.level)).map(m=>
+      `<span class="rot-p">${m.name}<span class="rot-pos">${posLabelsOf(m).join('·')}</span></span>`).join('');
+    return `<div class="rot-q">
+      <div class="rot-qh"><span class="rot-qn">${qi+1}Q</span>
+        ${holes.length?`<span class="rot-hole">⚠️ ${holes.join(', ')}</span>`:`<span class="rot-ok">✅ 구멍 없음</span>`}</div>
+      <div class="rot-players">${names}</div>
+    </div>`;
+  }).join('');
+  const roster = plan.perPlayer.slice().sort((a,b)=>b.qs.length-a.qs.length || tierVal(b.m.level)-tierVal(a.m.level)).map(p=>{
+    const low=p.qs.length<2;
+    return `<div class="rot-row ${low?'low':''}">
+      <span class="rot-name">${p.m.name}</span>
+      <span class="rot-qs">${[1,2,3,4].map(q=>`<span class="rot-chip ${p.qs.includes(q)?'on':''}">${q}</span>`).join('')}</span>
+      <span class="rot-cnt">${p.qs.length}쿼터</span>
+    </div>`;
+  }).join('');
+  return `
+    <div class="card">
+      <div class="row wrap" style="justify-content:space-between;align-items:baseline;gap:6px">
+        <h3 style="margin:0">🔄 ${bestTeam} 쿼터 로테이션</h3>
+        <span style="font-size:13px;color:var(--muted)">참석 ${pool.length}명 · 전원 최소 2쿼터</span>
+      </div>
+      ${plan.warn?`<div class="hole-warn mt10">⚠️ ${plan.warn}</div>`:''}
+      <div class="rot-grid mt10">${qCards}</div>
+      <div class="mt14">
+        <div class="ss-detail-title">선수별 출전 쿼터 (빨강 = 2쿼터 미만)</div>
+        ${roster}
+      </div>
+    </div>`;
 }
 
 async function renderBest() {
@@ -1338,6 +1446,8 @@ async function renderBest() {
 
   if (!resultPool.length) {
     result.innerHTML = `<div class="card lu-empty">${bestTeam} 팀 ${attendOnly?'참석':'배정'} 인원이 없습니다.</div>`;
+  } else if (bestMode==='rotation') {
+    result.innerHTML = renderRotationHtml(resultPool, planRotation(resultPool));
   } else {
     const five = pickBest(resultPool, bestMode);
     const depth = roleDepth(five);
