@@ -284,6 +284,36 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 .lu-player .lu-pname { flex: 1; font-weight: 700; font-size: 14px; }
 .lu-empty { color: var(--muted); font-size: 13px; padding: 14px; text-align: center; }
 
+/* BEST 5 */
+.best-team-btn, .best-mode-btn { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.best-team-btn.sel { background: var(--surface3); color: var(--text); border-color: var(--muted); }
+.best-mode-btn.sel { background: var(--accent); color: #241000; border-color: var(--accent); }
+.best-slot { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 6px; }
+.best-slot .bs-pos { width: 34px; height: 34px; flex-shrink: 0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; background: var(--surface3); color: var(--text); }
+.best-slot .bs-name { flex: 1; min-width: 0; font-weight: 700; font-size: 14px; }
+.best-slot .bs-sub { font-size: 11px; color: var(--muted); font-weight: 600; }
+.best-slot .bs-ovr { font-size: 20px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.best-slot.filled .bs-ovr { color: var(--accent); }
+.best-slot.gap { border-style: dashed; opacity: .75; }
+.best-bench { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.best-bench .bb { background: var(--surface2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 12px; color: var(--muted); }
+.best-bench .bb b { color: var(--text); font-weight: 700; }
+.prof-row { display: grid; grid-template-columns: 56px 1fr 34px; align-items: center; gap: 8px; margin-bottom: 6px; }
+.prof-row .pr-label { font-size: 12px; color: var(--muted); font-weight: 700; }
+.prof-row .pr-bar { height: 10px; border-radius: 999px; background: var(--surface3); overflow: hidden; }
+.prof-row .pr-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--out), var(--accent)); }
+.prof-row .pr-fill.weak { background: var(--in); }
+.prof-row .pr-val { font-size: 12px; font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
+.be-row { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 8px; }
+.be-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.be-head .be-name { font-weight: 800; font-size: 14px; flex: 1; }
+.be-head select { width: auto; padding: 4px 8px; font-size: 12px; }
+.be-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.be-stat { text-align: center; }
+.be-stat label { font-size: 10px; color: var(--muted); margin-bottom: 2px; display: block; }
+.be-stat input { padding: 5px 2px; text-align: center; font-size: 15px; font-weight: 800; }
+.be-ovr-tag { font-size: 12px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+
 /* TEAM ASSIGN (IN/OUT) */
 .team-count-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 .tc-box { border-radius: 10px; padding: 10px; text-align: center; background: #1c232e; border: 1px solid #262d38; }
@@ -354,6 +384,7 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 
 <nav>
   <button class="active" onclick="showPage('lineup',this)">🧑‍🤝‍🧑 라인업</button>
+  <button onclick="showPage('best',this)">⭐ 베스트5</button>
   <button onclick="showPage('members',this)">👥 인원</button>
   <button onclick="showPage('attend',this)">🗳 출석부</button>
   <button onclick="showPage('teams',this)">🎽 팀편성</button>
@@ -455,6 +486,56 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
     <div class="lu-count mt10" id="lineupCount"></div>
   </div>
   <div id="lineupBody"></div>
+</div>
+
+<!-- ========== 2.4 베스트5 (비밀번호 보호) ========== -->
+<div id="page-best" class="page">
+  <!-- 비밀번호 게이트 -->
+  <div id="bestGate">
+    <div class="card" style="max-width:380px;margin:40px auto;text-align:center">
+      <div style="font-size:34px;margin-bottom:6px">🔒</div>
+      <h2 style="justify-content:center">베스트5 · 전력 분석</h2>
+      <p class="text-sm" style="margin-bottom:14px">선수 능력치와 추천 라인업은 주장·관리자만 볼 수 있습니다.</p>
+      <input id="bestPw" type="password" placeholder="비밀번호" onkeydown="if(event.key==='Enter')bestUnlock()" style="text-align:center">
+      <p id="bestPwErr" style="color:var(--in);font-size:12px;margin-top:6px;min-height:14px"></p>
+      <button class="btn btn-red" style="width:100%" onclick="bestUnlock()">입장</button>
+    </div>
+  </div>
+
+  <!-- 콘텐츠 (잠금 해제 후) -->
+  <div id="bestContent" style="display:none">
+    <div class="card">
+      <div class="row wrap" style="justify-content:space-between;align-items:center;gap:8px">
+        <h2 style="margin:0">⭐ 베스트5 라인업</h2>
+        <button class="btn btn-sm btn-gray" onclick="bestLock()">🔒 잠그기</button>
+      </div>
+      <p class="text-sm mt6">교체 없이 풀쿼터를 돌리는 룰에 맞춰, <b>화력 최대</b> 또는 <b>약점 최소</b> 기준으로 5인을 추천합니다.</p>
+
+      <div class="row wrap mt10" style="gap:6px">
+        <button class="btn btn-sm best-team-btn sel" data-t="IN"  onclick="bestSetTeam('IN',this)">🔴 IN 팀</button>
+        <button class="btn btn-sm best-team-btn"     data-t="OUT" onclick="bestSetTeam('OUT',this)">🔵 OUT 팀</button>
+      </div>
+      <div class="row wrap mt6" style="gap:6px">
+        <button class="btn btn-sm best-mode-btn sel" data-m="best"    onclick="bestSetMode('best',this)">⭐ 화력 최대</button>
+        <button class="btn btn-sm best-mode-btn"     data-m="balance" onclick="bestSetMode('balance',this)">🛡 약점 최소</button>
+      </div>
+      <div class="cb-row mt10" style="margin:0">
+        <input type="checkbox" id="bestAttendOnly" onchange="renderBest()">
+        <span>이번 일요일 참석자만 대상으로</span>
+      </div>
+    </div>
+
+    <div id="bestResult"></div>
+
+    <div class="card">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h3 style="margin:0" id="bestEditTitle">🛠 선수 능력치</h3>
+        <button class="btn btn-sm btn-gray" onclick="loadMembers().then(renderBest)">↻ 새로고침</button>
+      </div>
+      <p class="text-sm mt6">포지션과 5능력치(1~5)를 조정하면 추천이 바로 반영됩니다. 비워두면 레벨 기준 기본값이 적용됩니다.</p>
+      <div id="bestEditList" class="mt10"></div>
+    </div>
+  </div>
 </div>
 
 <!-- ========== 2.5 룰북 ========== -->
@@ -818,6 +899,7 @@ function showPage(id, btn) {
   if (id === 'attend')  renderAttendPage();
   if (id === 'teams')   { renderTeamAssign(); renderGuestList(); }
   if (id === 'lineup')  initLineup();
+  if (id === 'best')    initBest();
   if (id === 'videos')  loadVideos();
 }
 
@@ -1148,6 +1230,172 @@ async function renderLineup() {
     html = `<div class="card lu-empty">이 날짜에 참석 체크한 인원이 없습니다.<br>출석부 탭에서 참석을 먼저 체크하세요.</div>`;
   }
   body.innerHTML = html;
+}
+
+// ========== BEST 5 (비밀번호 보호 · 능력치 기반 추천) ==========
+const BEST_PASSWORD = 'innout';   // 🔑 원하는 비밀번호로 바꾸세요
+const POS_LIST = ['PG','SG','SF','PF','C'];
+const STAT_KEYS = ['st_shoot','st_defense','st_handle','st_physical','st_speed'];
+const STAT_LABEL = { st_shoot:'슛', st_defense:'수비', st_handle:'볼핸들', st_physical:'피지컬', st_speed:'스피드' };
+let bestTeam = 'IN';
+let bestMode = 'best';
+
+function initBest() {
+  let ok = false;
+  try { ok = sessionStorage.getItem('best_ok') === '1'; } catch(e){}
+  document.getElementById('bestGate').style.display = ok ? 'none' : '';
+  document.getElementById('bestContent').style.display = ok ? '' : 'none';
+  if (ok) renderBest();
+  else { const p = document.getElementById('bestPw'); if (p) { p.value=''; setTimeout(()=>p.focus(),50); } }
+}
+function bestUnlock() {
+  const v = document.getElementById('bestPw').value;
+  if (v === BEST_PASSWORD) {
+    try { sessionStorage.setItem('best_ok','1'); } catch(e){}
+    document.getElementById('bestPwErr').textContent = '';
+    initBest();
+  } else {
+    document.getElementById('bestPwErr').textContent = '비밀번호가 맞지 않습니다';
+  }
+}
+function bestLock() { try { sessionStorage.removeItem('best_ok'); } catch(e){} initBest(); }
+function bestSetTeam(t, btn) { bestTeam=t; document.querySelectorAll('.best-team-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); renderBest(); }
+function bestSetMode(m, btn) { bestMode=m; document.querySelectorAll('.best-mode-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); renderBest(); }
+
+function defaultStat(level) { return level==='불꽃' ? 4 : level==='새싹' ? 2 : 3; }
+function statOf(m, key) { const v=m[key]; return (v===null||v===undefined||v==='') ? defaultStat(m.level) : +v; }
+function ovrOf(m) { return STAT_KEYS.reduce((s,k)=>s+statOf(m,k),0) / STAT_KEYS.length; }
+function posOf(m) {
+  if (m.pos && POS_LIST.includes(m.pos)) return m.pos;
+  if (m.is_center) return 'C';
+  return m.position==='앞선' ? 'PG' : 'SF';
+}
+function combos(arr, k) {
+  const res=[]; (function go(s,pick){ if(pick.length===k){res.push(pick.slice());return;} for(let i=s;i<arr.length;i++){pick.push(arr[i]);go(i+1,pick);pick.pop();} })(0,[]); return res;
+}
+function teamStatSums(five) { const o={}; STAT_KEYS.forEach(k=>o[k]=five.reduce((s,m)=>s+statOf(m,k),0)); return o; }
+function posCoverage(five) { return new Set(five.map(posOf)).size; }
+
+function pickBest(pool, mode) {
+  if (pool.length <= 5) return pool.slice();
+  let best=null, bestScore=-Infinity;
+  combos(pool,5).forEach(five=>{
+    const sums=teamStatSums(five);
+    const ovrSum=STAT_KEYS.reduce((s,k)=>s+sums[k],0);
+    const minStat=Math.min(...STAT_KEYS.map(k=>sums[k]));
+    const cover=posCoverage(five);
+    const score = (mode==='balance')
+      ? minStat*10000 + ovrSum*10 + cover
+      : cover*100000 + ovrSum*10 + minStat;
+    if (score>bestScore){ bestScore=score; best=five; }
+  });
+  return best;
+}
+function assignSlots(five) {
+  const slots={}; POS_LIST.forEach(p=>slots[p]=null);
+  const sorted=five.slice().sort((a,b)=>ovrOf(b)-ovrOf(a));
+  const rest=[];
+  sorted.forEach(m=>{ const p=posOf(m); if(!slots[p]) slots[p]=m; else rest.push(m); });
+  rest.forEach(m=>{ const e=POS_LIST.find(p=>!slots[p]); if(e) slots[e]=m; });
+  return slots;
+}
+
+async function renderBest() {
+  const result = document.getElementById('bestResult');
+  const editList = document.getElementById('bestEditList');
+  if (!result) return;
+
+  let pool = members.filter(m => m.team === bestTeam);
+  document.getElementById('bestEditTitle').textContent = `🛠 ${bestTeam} 팀 능력치 (${pool.length}명)`;
+
+  const attendOnly = document.getElementById('bestAttendOnly').checked;
+  let resultPool = pool;
+  if (attendOnly) {
+    const today=new Date(); today.setHours(0,0,0,0);
+    const sun=new Date(today); sun.setDate(sun.getDate()+(today.getDay()===0?0:7-today.getDay()));
+    const { data } = await SB.from('attendance').select('*').eq('session_date', toISO(sun)).eq('status','참석');
+    const goIds=new Set((data||[]).map(v=>v.member_id));
+    resultPool = pool.filter(m=>goIds.has(m.id));
+  }
+
+  if (!resultPool.length) {
+    result.innerHTML = `<div class="card lu-empty">${bestTeam} 팀 ${attendOnly?'참석':'배정'} 인원이 없습니다.</div>`;
+  } else {
+    const five = pickBest(resultPool, bestMode);
+    const slots = assignSlots(five);
+    const sums = teamStatSums(five);
+    const maxSum = Math.max(...STAT_KEYS.map(k=>sums[k]), 1);
+    const minSum = Math.min(...STAT_KEYS.map(k=>sums[k]));
+    const fiveIds = new Set(five.map(m=>m.id));
+    const bench = resultPool.filter(m=>!fiveIds.has(m.id)).sort((a,b)=>ovrOf(b)-ovrOf(a));
+    const teamOvr = five.reduce((s,m)=>s+ovrOf(m),0)/five.length;
+
+    const slotHtml = POS_LIST.map(p=>{
+      const m=slots[p];
+      if (!m) return `<div class="best-slot gap"><div class="bs-pos">${p}</div><div class="bs-name" style="color:var(--muted)">(포지션 공백)</div></div>`;
+      const nat=posOf(m);
+      return `<div class="best-slot filled">
+        <div class="bs-pos">${p}</div>
+        <div style="flex:1;min-width:0"><div class="bs-name">${m.name}</div><div class="bs-sub">${nat!==p?`주 ${nat} · `:''}${m.level}</div></div>
+        <div class="bs-ovr">${ovrOf(m).toFixed(1)}</div>
+      </div>`;
+    }).join('');
+
+    const profHtml = STAT_KEYS.map(k=>{
+      const v=sums[k], weak=(v===minSum);
+      return `<div class="prof-row">
+        <span class="pr-label">${STAT_LABEL[k]}</span>
+        <span class="pr-bar"><span class="pr-fill ${weak?'weak':''}" style="width:${Math.round(v/maxSum*100)}%"></span></span>
+        <span class="pr-val">${v}</span>
+      </div>`;
+    }).join('');
+
+    result.innerHTML = `
+      <div class="card">
+        <div class="row wrap" style="justify-content:space-between;align-items:baseline;gap:6px">
+          <h3 style="margin:0">${bestMode==='best'?'⭐ 화력 최대':'🛡 약점 최소'} · ${bestTeam} 베스트5</h3>
+          <span style="font-size:13px;color:var(--muted)">팀 평균 OVR <b style="color:var(--accent);font-size:17px">${teamOvr.toFixed(1)}</b></span>
+        </div>
+        <div class="mt10">${slotHtml}</div>
+        ${bench.length?`<div class="best-bench">벤치 ${bench.map(m=>`<span class="bb"><b>${m.name}</b> ${ovrOf(m).toFixed(1)}</span>`).join('')}</div>`:''}
+        <div class="mt14">
+          <div class="ss-detail-title">팀 능력 프로파일 — 5인 합계 (빨간 막대 = 최약점)</div>
+          ${profHtml}
+        </div>
+      </div>`;
+  }
+
+  editList.innerHTML = pool.length ? pool.map(m=>`
+    <div class="be-row">
+      <div class="be-head">
+        <span class="be-name">${m.name}</span>
+        <span class="be-ovr-tag">OVR ${ovrOf(m).toFixed(1)}</span>
+        <select onchange="bestSaveField(${m.id},'pos',this.value)">
+          ${POS_LIST.map(p=>`<option value="${p}" ${posOf(m)===p?'selected':''}>${p}</option>`).join('')}
+        </select>
+      </div>
+      <div class="be-stats">
+        ${STAT_KEYS.map(k=>`<div class="be-stat">
+          <label>${STAT_LABEL[k]}</label>
+          <input type="number" min="1" max="5" value="${statOf(m,k)}" onchange="bestSaveField(${m.id},'${k}',this.value)">
+        </div>`).join('')}
+      </div>
+    </div>`).join('') : '<p class="text-sm">이 팀에 배정된 인원이 없습니다. 팀편성 탭에서 IN/OUT을 배정하세요.</p>';
+}
+
+async function bestSaveField(id, field, value) {
+  let v = value;
+  if (field !== 'pos') v = Math.max(1, Math.min(5, parseInt(value)||3));
+  const { error } = await SB.from('members').update({ [field]: v }).eq('id', id);
+  if (error) {
+    if (/column|does not exist|could not find/i.test(error.message)) {
+      toast('members에 능력치 컬럼이 필요합니다', '#c0392b');
+      alert('Supabase에서 아래 SQL을 한 번만 실행해주세요:\n\nalter table members add column if not exists pos text;\nalter table members add column if not exists st_shoot int;\nalter table members add column if not exists st_defense int;\nalter table members add column if not exists st_handle int;\nalter table members add column if not exists st_physical int;\nalter table members add column if not exists st_speed int;');
+    } else toast('저장 실패: '+error.message, '#c0392b');
+    return;
+  }
+  const m = members.find(x=>x.id===id); if (m) m[field]=v;
+  renderBest();
 }
 
 async function renderAttendPage() {
