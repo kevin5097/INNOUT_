@@ -289,30 +289,31 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 .best-team-btn.sel { background: var(--surface3); color: var(--text); border-color: var(--muted); }
 .best-mode-btn.sel { background: var(--accent); color: #241000; border-color: var(--accent); }
 .best-slot { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; margin-bottom: 6px; }
-.best-slot .bs-pos { width: 34px; height: 34px; flex-shrink: 0; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 13px; background: var(--surface3); color: var(--text); }
-.best-slot .bs-name { flex: 1; min-width: 0; font-weight: 700; font-size: 14px; }
-.best-slot .bs-sub { font-size: 11px; color: var(--muted); font-weight: 600; }
-.best-slot .bs-ovr { font-size: 20px; font-weight: 900; font-variant-numeric: tabular-nums; }
-.best-slot.filled .bs-ovr { color: var(--accent); }
-.best-slot.gap { border-style: dashed; opacity: .75; }
-.best-bench { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.best-bench .bb { background: var(--surface2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 12px; color: var(--muted); }
+.best-slot .bs-name { font-weight: 800; font-size: 14px; }
+.best-slot .bs-sub { font-size: 11px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+.best-bench { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; font-size: 12px; color: var(--muted); align-items: center; }
+.best-bench .bb { background: var(--surface2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; }
 .best-bench .bb b { color: var(--text); font-weight: 700; }
-.prof-row { display: grid; grid-template-columns: 56px 1fr 34px; align-items: center; gap: 8px; margin-bottom: 6px; }
-.prof-row .pr-label { font-size: 12px; color: var(--muted); font-weight: 700; }
-.prof-row .pr-bar { height: 10px; border-radius: 999px; background: var(--surface3); overflow: hidden; }
-.prof-row .pr-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--out), var(--accent)); }
-.prof-row .pr-fill.weak { background: var(--in); }
-.prof-row .pr-val { font-size: 12px; font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
-.be-row { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 8px; }
+/* 역할 커버리지 */
+.cov-row { display: grid; grid-template-columns: 76px 1fr; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.cov-row:first-child { border-top: none; }
+.cov-tag { font-weight: 700; color: var(--muted); }
+.cov-who { color: var(--text); }
+.cov-row.hole .cov-tag { color: var(--in); }
+.cov-row.hole .cov-who { color: var(--in); font-weight: 700; }
+.hole-warn { background: rgba(255,71,87,.12); border: 1px solid rgba(255,71,87,.35); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; color: #ff9aa2; line-height: 1.6; }
+.hole-warn b { color: #ffc1c6; }
+.hole-ok { background: rgba(46,213,115,.1); border: 1px solid rgba(46,213,115,.3); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 13px; color: #7ee6a8; }
+/* 특징 편집 */
+.be-row { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; margin-bottom: 8px; }
 .be-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.be-head .be-name { font-weight: 800; font-size: 14px; flex: 1; }
-.be-head select { width: auto; padding: 4px 8px; font-size: 12px; }
-.be-stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-.be-stat { text-align: center; }
-.be-stat label { font-size: 10px; color: var(--muted); margin-bottom: 2px; display: block; }
-.be-stat input { padding: 5px 2px; text-align: center; font-size: 15px; font-weight: 800; }
-.be-ovr-tag { font-size: 12px; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+.be-head .be-name { font-weight: 800; font-size: 15px; flex: 1; }
+.be-head select { width: auto; padding: 5px 8px; font-size: 13px; }
+.be-poslabel { font-size: 11px; color: var(--muted); font-weight: 700; margin: 6px 0 4px; }
+.be-pos, .be-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { background: var(--surface3); color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all .12s; }
+.chip:active { transform: scale(.95); }
+.chip.on { background: var(--accent); color: #241000; border-color: var(--accent); }
 
 /* TEAM ASSIGN (IN/OUT) */
 .team-count-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
@@ -1234,9 +1235,10 @@ async function renderLineup() {
 
 // ========== BEST 5 (비밀번호 보호 · 능력치 기반 추천) ==========
 const BEST_PASSWORD = 'innout';   // 🔑 원하는 비밀번호로 바꾸세요
-const POS_LIST = ['PG','SG','SF','PF','C'];
-const STAT_KEYS = ['st_shoot','st_defense','st_handle','st_physical','st_speed'];
-const STAT_LABEL = { st_shoot:'슛', st_defense:'수비', st_handle:'볼핸들', st_physical:'피지컬', st_speed:'스피드' };
+const POS3 = [{k:'pos_g',label:'가드'},{k:'pos_w',label:'윙'},{k:'pos_b',label:'빅'}];
+const ROLE_TAGS = ['외곽슛','돌파','골밑','볼핸들·패스','수비','리바운드','스피드'];
+const SCORING_TAGS = ['외곽슛','돌파','골밑'];   // 이 중 하나는 있어야 득점 구멍 아님
+const CRITICAL_TAGS = ['수비','리바운드','볼핸들·패스']; // 비면 치명적 구멍
 let bestTeam = 'IN';
 let bestMode = 'best';
 
@@ -1262,42 +1264,58 @@ function bestLock() { try { sessionStorage.removeItem('best_ok'); } catch(e){} i
 function bestSetTeam(t, btn) { bestTeam=t; document.querySelectorAll('.best-team-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); renderBest(); }
 function bestSetMode(m, btn) { bestMode=m; document.querySelectorAll('.best-mode-btn').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); renderBest(); }
 
-function defaultStat(level) { return level==='불꽃' ? 4 : level==='새싹' ? 2 : 3; }
-function statOf(m, key) { const v=m[key]; return (v===null||v===undefined||v==='') ? defaultStat(m.level) : +v; }
-function ovrOf(m) { return STAT_KEYS.reduce((s,k)=>s+statOf(m,k),0) / STAT_KEYS.length; }
-function posOf(m) {
-  if (m.pos && POS_LIST.includes(m.pos)) return m.pos;
-  if (m.is_center) return 'C';
-  return m.position==='앞선' ? 'PG' : 'SF';
+// ---- 데이터 헬퍼 ----
+function tierVal(level) { return level==='불꽃' ? 3 : level==='새싹' ? 1 : 2; }   // 종합 실력
+function tagsOf(m) { return (m.tags||'').split(',').map(s=>s.trim()).filter(Boolean); }
+function hasTag(m, t) { return tagsOf(m).includes(t); }
+function posLabelsOf(m) {
+  const ls = POS3.filter(p=>m[p.k]).map(p=>p.label);
+  if (ls.length) return ls;
+  // 초기값: 기존 포지션/센터에서 추정
+  if (m.is_center) return ['빅'];
+  return m.position==='앞선' ? ['가드'] : ['윙'];
 }
 function combos(arr, k) {
   const res=[]; (function go(s,pick){ if(pick.length===k){res.push(pick.slice());return;} for(let i=s;i<arr.length;i++){pick.push(arr[i]);go(i+1,pick);pick.pop();} })(0,[]); return res;
 }
-function teamStatSums(five) { const o={}; STAT_KEYS.forEach(k=>o[k]=five.reduce((s,m)=>s+statOf(m,k),0)); return o; }
-function posCoverage(five) { return new Set(five.map(posOf)).size; }
 
+// 조합의 역할별 담당 인원 수
+function roleDepth(five) {
+  const d={}; ROLE_TAGS.forEach(t=>d[t]=five.filter(m=>hasTag(m,t)).length); return d;
+}
+// 구멍(비어있는 핵심 역할) 목록
+function holesOf(five) {
+  const d = roleDepth(five);
+  const holes = CRITICAL_TAGS.filter(t=>d[t]===0);
+  if (SCORING_TAGS.every(t=>d[t]===0)) holes.push('득점');
+  return holes;
+}
+function coveredCount(five) { const d=roleDepth(five); return ROLE_TAGS.filter(t=>d[t]>0).length; }
+function strengthOf(five) { return five.reduce((s,m)=>s+tierVal(m.level),0); }
+function posCoverage3(five) { return new Set([].concat(...five.map(posLabelsOf))).size; }
+
+// 베스트 라인업 선택 (전수 탐색)
 function pickBest(pool, mode) {
   if (pool.length <= 5) return pool.slice();
-  let best=null, bestScore=-Infinity;
+  let best=null, score=-Infinity;
   combos(pool,5).forEach(five=>{
-    const sums=teamStatSums(five);
-    const ovrSum=STAT_KEYS.reduce((s,k)=>s+sums[k],0);
-    const minStat=Math.min(...STAT_KEYS.map(k=>sums[k]));
-    const cover=posCoverage(five);
-    const score = (mode==='balance')
-      ? minStat*10000 + ovrSum*10 + cover
-      : cover*100000 + ovrSum*10 + minStat;
-    if (score>bestScore){ bestScore=score; best=five; }
+    const cov = coveredCount(five);
+    const str = strengthOf(five);
+    const posc = posCoverage3(five);
+    const d = roleDepth(five);
+    const minDepth = Math.min(...ROLE_TAGS.map(t=>d[t]));   // 모든 역할 최소 보유수(0이면 구멍)
+    const holes = holesOf(five).length;
+    let sc;
+    if (mode==='balance') {
+      // 약점 최소: 구멍 최소 → 역할 커버 최대 → 균형(최소깊이) → 전력 → 포지션
+      sc = (-holes)*1e9 + cov*1e6 + minDepth*1e4 + str*100 + posc;
+    } else {
+      // 화력 최대: 전력 최대 → 구멍 최소 → 커버 → 포지션
+      sc = str*1e7 + (-holes)*1e5 + cov*1e3 + posc*10;
+    }
+    if (sc>score){ score=sc; best=five; }
   });
   return best;
-}
-function assignSlots(five) {
-  const slots={}; POS_LIST.forEach(p=>slots[p]=null);
-  const sorted=five.slice().sort((a,b)=>ovrOf(b)-ovrOf(a));
-  const rest=[];
-  sorted.forEach(m=>{ const p=posOf(m); if(!slots[p]) slots[p]=m; else rest.push(m); });
-  rest.forEach(m=>{ const e=POS_LIST.find(p=>!slots[p]); if(e) slots[e]=m; });
-  return slots;
 }
 
 async function renderBest() {
@@ -1306,7 +1324,7 @@ async function renderBest() {
   if (!result) return;
 
   let pool = members.filter(m => m.team === bestTeam);
-  document.getElementById('bestEditTitle').textContent = `🛠 ${bestTeam} 팀 능력치 (${pool.length}명)`;
+  document.getElementById('bestEditTitle').textContent = `🛠 ${bestTeam} 팀 특징 (${pool.length}명)`;
 
   const attendOnly = document.getElementById('bestAttendOnly').checked;
   let resultPool = pool;
@@ -1322,80 +1340,98 @@ async function renderBest() {
     result.innerHTML = `<div class="card lu-empty">${bestTeam} 팀 ${attendOnly?'참석':'배정'} 인원이 없습니다.</div>`;
   } else {
     const five = pickBest(resultPool, bestMode);
-    const slots = assignSlots(five);
-    const sums = teamStatSums(five);
-    const maxSum = Math.max(...STAT_KEYS.map(k=>sums[k]), 1);
-    const minSum = Math.min(...STAT_KEYS.map(k=>sums[k]));
+    const depth = roleDepth(five);
+    const holes = holesOf(five);
+    const str = strengthOf(five);
     const fiveIds = new Set(five.map(m=>m.id));
-    const bench = resultPool.filter(m=>!fiveIds.has(m.id)).sort((a,b)=>ovrOf(b)-ovrOf(a));
-    const teamOvr = five.reduce((s,m)=>s+ovrOf(m),0)/five.length;
+    const bench = resultPool.filter(m=>!fiveIds.has(m.id)).sort((a,b)=>tierVal(b.level)-tierVal(a.level));
 
-    const slotHtml = POS_LIST.map(p=>{
-      const m=slots[p];
-      if (!m) return `<div class="best-slot gap"><div class="bs-pos">${p}</div><div class="bs-name" style="color:var(--muted)">(포지션 공백)</div></div>`;
-      const nat=posOf(m);
-      return `<div class="best-slot filled">
-        <div class="bs-pos">${p}</div>
-        <div style="flex:1;min-width:0"><div class="bs-name">${m.name}</div><div class="bs-sub">${nat!==p?`주 ${nat} · `:''}${m.level}</div></div>
-        <div class="bs-ovr">${ovrOf(m).toFixed(1)}</div>
+    const tierBadge = lv => `<span class="badge b-${lv||'번개'}">${lv==='불꽃'?'🔥상':lv==='새싹'?'🌱하':'⚡중'}</span>`;
+    const playerHtml = five.slice().sort((a,b)=>tierVal(b.level)-tierVal(a.level)).map(m=>`
+      <div class="best-slot filled">
+        <div style="flex:1;min-width:0">
+          <div class="bs-name">${m.name}</div>
+          <div class="bs-sub">${posLabelsOf(m).join('·')}${tagsOf(m).length?' · '+tagsOf(m).join(', '):''}</div>
+        </div>
+        ${tierBadge(m.level)}
+      </div>`).join('');
+
+    const covHtml = ROLE_TAGS.map(t=>{
+      const who = five.filter(m=>hasTag(m,t)).map(m=>m.name);
+      const ok = who.length>0;
+      return `<div class="cov-row ${ok?'':'hole'}">
+        <span class="cov-tag">${t}</span>
+        <span class="cov-who">${ok?who.join(', ')+` (${who.length})`:'담당 없음'}</span>
       </div>`;
     }).join('');
 
-    const profHtml = STAT_KEYS.map(k=>{
-      const v=sums[k], weak=(v===minSum);
-      return `<div class="prof-row">
-        <span class="pr-label">${STAT_LABEL[k]}</span>
-        <span class="pr-bar"><span class="pr-fill ${weak?'weak':''}" style="width:${Math.round(v/maxSum*100)}%"></span></span>
-        <span class="pr-val">${v}</span>
-      </div>`;
-    }).join('');
+    const holeWarn = holes.length
+      ? `<div class="hole-warn">⚠️ 구멍: <b>${holes.join(', ')}</b> — 교체 없이 풀쿼터면 이 역할이 비어 불리할 수 있습니다.</div>`
+      : `<div class="hole-ok">✅ 핵심 역할에 구멍이 없습니다.</div>`;
 
     result.innerHTML = `
       <div class="card">
         <div class="row wrap" style="justify-content:space-between;align-items:baseline;gap:6px">
           <h3 style="margin:0">${bestMode==='best'?'⭐ 화력 최대':'🛡 약점 최소'} · ${bestTeam} 베스트5</h3>
-          <span style="font-size:13px;color:var(--muted)">팀 평균 OVR <b style="color:var(--accent);font-size:17px">${teamOvr.toFixed(1)}</b></span>
+          <span style="font-size:13px;color:var(--muted)">전력 <b style="color:var(--accent);font-size:16px">${str}</b> · 역할 ${coveredCount(five)}/${ROLE_TAGS.length}</span>
         </div>
-        <div class="mt10">${slotHtml}</div>
-        ${bench.length?`<div class="best-bench">벤치 ${bench.map(m=>`<span class="bb"><b>${m.name}</b> ${ovrOf(m).toFixed(1)}</span>`).join('')}</div>`:''}
-        <div class="mt14">
-          <div class="ss-detail-title">팀 능력 프로파일 — 5인 합계 (빨간 막대 = 최약점)</div>
-          ${profHtml}
+        <div class="mt10">${playerHtml}</div>
+        ${bench.length?`<div class="best-bench">벤치 ${bench.map(m=>`<span class="bb"><b>${m.name}</b></span>`).join('')}</div>`:''}
+        <div class="mt14">${holeWarn}</div>
+        <div class="mt10">
+          <div class="ss-detail-title">역할 커버리지 (누가 담당하나)</div>
+          ${covHtml}
         </div>
       </div>`;
   }
 
-  editList.innerHTML = pool.length ? pool.map(m=>`
-    <div class="be-row">
+  // 특징 편집 (팀 전원)
+  editList.innerHTML = pool.length ? pool.map(m=>{
+    const mine = tagsOf(m);
+    return `<div class="be-row">
       <div class="be-head">
         <span class="be-name">${m.name}</span>
-        <span class="be-ovr-tag">OVR ${ovrOf(m).toFixed(1)}</span>
-        <select onchange="bestSaveField(${m.id},'pos',this.value)">
-          ${POS_LIST.map(p=>`<option value="${p}" ${posOf(m)===p?'selected':''}>${p}</option>`).join('')}
+        <select onchange="bestSaveField(${m.id},'level',this.value)" title="종합 실력">
+          <option value="불꽃" ${m.level==='불꽃'?'selected':''}>🔥 상</option>
+          <option value="번개" ${(!m.level||m.level==='번개')?'selected':''}>⚡ 중</option>
+          <option value="새싹" ${m.level==='새싹'?'selected':''}>🌱 하</option>
         </select>
       </div>
-      <div class="be-stats">
-        ${STAT_KEYS.map(k=>`<div class="be-stat">
-          <label>${STAT_LABEL[k]}</label>
-          <input type="number" min="1" max="5" value="${statOf(m,k)}" onchange="bestSaveField(${m.id},'${k}',this.value)">
-        </div>`).join('')}
+      <div class="be-poslabel">포지션(겸임 가능)</div>
+      <div class="be-pos">
+        ${POS3.map(p=>`<button class="chip ${m[p.k]?'on':''}" onclick="bestTogglePos(${m.id},'${p.k}')">${p.label}</button>`).join('')}
       </div>
-    </div>`).join('') : '<p class="text-sm">이 팀에 배정된 인원이 없습니다. 팀편성 탭에서 IN/OUT을 배정하세요.</p>';
+      <div class="be-poslabel">강점 태그</div>
+      <div class="be-tags">
+        ${ROLE_TAGS.map(t=>`<button class="chip ${mine.includes(t)?'on':''}" onclick="bestToggleTag(${m.id},'${t}')">${t}</button>`).join('')}
+      </div>
+    </div>`;
+  }).join('') : '<p class="text-sm">이 팀에 배정된 인원이 없습니다. 팀편성 탭에서 IN/OUT을 배정하세요.</p>';
 }
 
+const BEST_SQL = 'alter table members add column if not exists pos_g boolean default false;\nalter table members add column if not exists pos_w boolean default false;\nalter table members add column if not exists pos_b boolean default false;\nalter table members add column if not exists tags text;';
+
 async function bestSaveField(id, field, value) {
-  let v = value;
-  if (field !== 'pos') v = Math.max(1, Math.min(5, parseInt(value)||3));
-  const { error } = await SB.from('members').update({ [field]: v }).eq('id', id);
+  const { error } = await SB.from('members').update({ [field]: value }).eq('id', id);
   if (error) {
     if (/column|does not exist|could not find/i.test(error.message)) {
-      toast('members에 능력치 컬럼이 필요합니다', '#c0392b');
-      alert('Supabase에서 아래 SQL을 한 번만 실행해주세요:\n\nalter table members add column if not exists pos text;\nalter table members add column if not exists st_shoot int;\nalter table members add column if not exists st_defense int;\nalter table members add column if not exists st_handle int;\nalter table members add column if not exists st_physical int;\nalter table members add column if not exists st_speed int;');
+      toast('members에 특징 컬럼이 필요합니다', '#c0392b');
+      alert('Supabase에서 아래 SQL을 한 번만 실행해주세요:\n\n'+BEST_SQL);
     } else toast('저장 실패: '+error.message, '#c0392b');
     return;
   }
-  const m = members.find(x=>x.id===id); if (m) m[field]=v;
+  const m = members.find(x=>x.id===id); if (m) m[field]=value;
   renderBest();
+}
+async function bestTogglePos(id, key) {
+  const m = members.find(x=>x.id===id); if (!m) return;
+  await bestSaveField(id, key, !m[key]);
+}
+async function bestToggleTag(id, tag) {
+  const m = members.find(x=>x.id===id); if (!m) return;
+  const cur = tagsOf(m);
+  const next = cur.includes(tag) ? cur.filter(t=>t!==tag) : cur.concat(tag);
+  await bestSaveField(id, 'tags', next.join(','));
 }
 
 async function renderAttendPage() {
