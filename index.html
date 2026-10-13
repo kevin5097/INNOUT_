@@ -359,6 +359,30 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 .ta-group-title.na  { color: #6b7583; }
 
 /* RULEBOOK */
+.rb-seg { display: flex; gap: 6px; margin-bottom: 12px; }
+.rb-seg-btn { flex: 1; padding: 11px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-weight: 700; font-size: 13.5px; cursor: pointer; font-family: inherit; transition: all .15s; }
+.rb-seg-btn.active { background: var(--in); color: #fff; border-color: var(--in); }
+.acc-item { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
+.acc-h { width: 100%; text-align: left; background: transparent; border: none; color: var(--text); font-weight: 800; font-size: 15px; padding: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-family: inherit; }
+.acc-h span { color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+.acc-item.open .acc-h span { transform: rotate(180deg); }
+.acc-b { display: none; padding: 0 14px 14px; }
+.acc-item.open .acc-b { display: block; animation: pageIn .2s ease; }
+.acc-b ul { list-style: none; padding: 0; margin: 0; }
+.acc-b li { font-size: 13.5px; color: var(--text); line-height: 1.75; padding-left: 14px; position: relative; margin-bottom: 5px; }
+.acc-b li::before { content: '·'; position: absolute; left: 3px; color: var(--in); font-weight: 900; }
+.acc-b li b { color: #fff; }
+.acc-b .qa { margin-bottom: 12px; }
+.acc-b .qa .q { font-weight: 800; color: var(--text); font-size: 13.5px; }
+.acc-b .qa .a { font-size: 13px; color: var(--muted); line-height: 1.7; margin-top: 3px; }
+.acc-b .sig { display: flex; gap: 10px; align-items: baseline; font-size: 13.5px; margin-bottom: 7px; color: var(--text); }
+.acc-b .sig b { width: 110px; flex-shrink: 0; color: var(--accent); font-weight: 700; }
+.acc-b h5 { font-size: 13px; color: var(--accent); margin: 14px 0 6px; font-weight: 800; }
+.acc-b h5:first-child { margin-top: 2px; }
+.court-wrap2 { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; margin-bottom: 10px; }
+.court-svg { width: 100%; max-width: 300px; height: auto; display: block; margin: 0 auto; }
+.court-svg text { fill: #cfd6e0; font-size: 9px; font-weight: 700; }
+.court-svg text.hl { fill: #ff8a3d; }
 .rulebook h2 { margin-bottom: 12px; }
 .rb-notice { background: #2c1810; border: 1px solid #8b4513; border-radius: 10px; padding: 12px 14px; font-size: 13px; color: #f0c090; line-height: 1.7; margin-bottom: 12px; }
 .rb-notice b { color: #ffcf9e; }
@@ -559,6 +583,11 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
 
 <!-- ========== 2.5 룰북 ========== -->
 <div id="page-rulebook" class="page">
+  <div class="rb-seg">
+    <button class="rb-seg-btn active" onclick="rbTab('local',this)">🏀 팀전 로컬룰</button>
+    <button class="rb-seg-btn" onclick="rbTab('official',this)">📖 공식 규칙</button>
+  </div>
+  <div id="rbLocal">
   <div class="card rulebook">
     <h2>📖 INNOUT 팀전 룰북</h2>
     <div class="rb-notice">
@@ -646,6 +675,171 @@ canvas#tacticCanvas { display: block; touch-action: none; width: 100%; }
         <p><b>승률이 낮은 팀 주장</b>이 먼저 당일 팀원으로 선점합니다.</p>
       </div>
     </div>
+  </div>
+  </div><!-- /rbLocal -->
+
+  <div id="rbOfficial" style="display:none">
+    <div class="card">
+      <h2>📖 공식 규칙 요약</h2>
+      <p class="text-sm">2025 FIBA 공식 농구경기 규칙서 기준으로, 생활농구에서 자주 쓰는 핵심만 추렸습니다. 항목을 눌러 펼쳐보세요.</p>
+      <div class="rb-notice mt10">생활농구는 코트 크기·경기 시간·팀 파울 기준 등을 로컬룰로 조정하는 경우가 많습니다. 세부는 <b>우리 팀전 로컬룰을 우선</b>합니다.</div>
+    </div>
+
+    <div class="acc-item open">
+      <button class="acc-h" onclick="rbAcc(this)">🏀 코트 한눈에 보기<span>▾</span></button>
+      <div class="acc-b">
+        <div class="court-wrap2">
+          <svg viewBox="0 0 300 292" class="court-svg" xmlns="http://www.w3.org/2000/svg">
+            <rect x="15" y="15" width="270" height="262" rx="2" fill="#15314c" stroke="#9fb0c3" stroke-width="2"/>
+            <rect x="106" y="15" width="88" height="104" fill="#1e466a" stroke="#9fb0c3" stroke-width="1.5"/>
+            <path d="M118,119 A32,32 0 0 0 182,119" fill="none" stroke="#9fb0c3" stroke-width="1.5"/>
+            <path d="M118,119 A32,32 0 0 1 182,119" fill="none" stroke="#9fb0c3" stroke-width="1.3" stroke-dasharray="4 3"/>
+            <path d="M34,15 L34,78 A121,121 0 0 0 266,78 L266,15" fill="none" stroke="#ff8a3d" stroke-width="2.2"/>
+            <path d="M134,52 A17,17 0 0 0 166,52" fill="none" stroke="#9fb0c3" stroke-width="1.3"/>
+            <line x1="134" y1="37" x2="166" y2="37" stroke="#e6eaf0" stroke-width="3"/>
+            <circle cx="150" cy="46" r="7" fill="none" stroke="#ff8a3d" stroke-width="2.2"/>
+            <path d="M118,277 A32,32 0 0 1 182,277" fill="none" stroke="#9fb0c3" stroke-width="1.5"/>
+            <text x="150" y="88" text-anchor="middle">제한구역</text>
+            <text x="150" y="99" text-anchor="middle">(페인트존)</text>
+            <text x="150" y="133" text-anchor="middle">자유투 라인</text>
+            <text x="150" y="200" text-anchor="middle" class="hl">3점 라인</text>
+            <text x="150" y="64" text-anchor="middle" font-size="7">노차지</text>
+            <text x="252" y="28" text-anchor="middle" font-size="7.5">사이드라인</text>
+            <text x="150" y="271" text-anchor="middle" font-size="7.5">하프라인(센터)</text>
+            <text x="150" y="27" text-anchor="middle" font-size="7.5">엔드라인 · 림</text>
+          </svg>
+        </div>
+        <ul>
+          <li><b>제한구역(페인트존)</b>: 바스켓 앞 직사각형. 공격수는 여기 <b>3초</b> 이상 못 머묾</li>
+          <li><b>3점 라인(주황)</b> 밖에서 넣으면 3점, 안쪽은 2점</li>
+          <li><b>노차지 반원</b>: 바스켓 바로 밑. 이 안에선 수비 차징(돌진 파울)을 안 줌</li>
+          <li><b>자유투 라인</b>: 파울로 얻은 자유투를 쏘는 선</li>
+          <li><b>엔드라인·사이드라인</b>: 코트 경계. 공이나 밟은 발이 닿으면 아웃</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-h" onclick="rbAcc(this)">⏱ 경기 기본 (시간·득점·흐름)<span>▾</span></button>
+      <div class="acc-b">
+        <ul>
+          <li>5 대 5, <b>10분 4쿼터</b>로 진행 (생활농구는 쿼터 시간을 짧게 조정하기도 함)</li>
+          <li>쿼터 사이·3→4쿼터 사이·연장 전 휴식은 <b>2분</b>, 하프타임은 <b>15분</b></li>
+          <li>동점이면 <b>5분 연장</b>, 승부가 날 때까지 반복</li>
+          <li>1쿼터·후반 시작은 <b>센터서클 점프볼</b>, 나머지 쿼터는 <b>교대 소유(화살표)</b>로 드로인 시작</li>
+          <li>득점: 3점 라인 밖 <b>3점</b> · 안쪽 <b>2점</b> · 자유투 <b>1점</b></li>
+          <li>자기 팀 골대에 넣으면 상대팀 2점으로 인정, 고의로 자기 골에 넣으면 무효</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-h" onclick="rbAcc(this)">⏳ 시간 규칙 (24·8·5·3초)<span>▾</span></button>
+      <div class="acc-b">
+        <ul>
+          <li><b>24초</b> 샷클락: 공격은 24초 안에 슛해야 하고 공이 림을 맞혀야 함. 공격 리바운드 등 일부 상황은 <b>14초</b>로 리셋</li>
+          <li><b>8초</b>: 백코트(우리 진영)에서 공을 잡으면 8초 안에 하프라인을 넘어야 함</li>
+          <li><b>5초</b>: ① 1m 이내 적극 수비(근접 방어)를 받으면 5초 안에 패스·드리블·슛 ② 드로인도 5초 안에 던져야 함</li>
+          <li><b>3초</b>: 공격수는 상대 제한구역(페인트존) 안에 3초 넘게 머물 수 없음</li>
+          <li>타임아웃: 1회 <b>1분</b>. 전반 2회·후반 3회(단 4쿼터 2분 이하는 최대 2회), 연장은 각 1회</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-h" onclick="rbAcc(this)">🏃 바이얼레이션 (어기면 공격권이 상대에게)<span>▾</span></button>
+      <div class="acc-b">
+        <ul>
+          <li><b>트래블링</b>: 드리블 없이 피벗풋을 떼고 이동하거나, 공을 잡은 채 걷는 것</li>
+          <li><b>더블드리블</b>: 드리블을 끝낸 뒤 다시 드리블하거나 양손으로 동시에 드리블</li>
+          <li><b>백코트 바이얼레이션</b>: 프론트로 넘어온 공을 다시 우리 백코트로 보내는 것</li>
+          <li><b>아웃</b>: 공이나 밟고 있는 발이 경계선을 밟거나 넘어가면 아웃</li>
+          <li><b>골텐딩·간섭</b>: 하강 중인 슛이나 림 위의 공을 건드리는 것 (수비가 하면 득점 인정, 공격이 하면 무효)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-h" onclick="rbAcc(this)">✋ 파울<span>▾</span></button>
+      <div class="acc-b">
+        <ul>
+          <li><b>퍼스널 파울</b>: 홀딩(붙잡기)·푸싱(밀기)·차징(공격자 돌진)·블로킹(부당하게 진로 막기)·핸드체킹(손으로 견제)</li>
+          <li><b>차징 vs 블로킹</b>: 수비가 <b>먼저</b> 정당한 위치(두 발 딛고 정면)를 잡았으면 공격자 차징, 움직이며 막았으면 수비 블로킹. 골밑 <b>노차지 반원</b> 안에서는 차징을 안 줌</li>
+          <li><b>팀 파울</b>: 한 쿼터에 4개까지는 드로인, <b>5번째 파울부터</b> 상대에게 자유투 2개(보너스)</li>
+          <li><b>개인 5반칙</b>이면 코트에서 퇴장</li>
+          <li><b>자유투</b>: 슛 동작 중 파울이면 2개(3점 지역은 3개), 슛이 들어갔으면 득점 인정 + 1개</li>
+          <li><b>테크니컬 파울</b>(비신사적 언행 등): 상대 자유투 1개 + 공격권 유지</li>
+          <li><b>언스포츠맨라이크(U파울)</b>: 과격·고의성 접촉 → 자유투 + 공격권</li>
+          <li><b>실격(D파울)</b>: 심한 행위 → 자유투 + 공격권 + 즉시 퇴장</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-h" onclick="rbAcc(this)">🙋 자주 헷갈리는 상황 Q&A<span>▾</span></button>
+      <div class="acc-b">
+        <div class="qa"><div class="q">Q. 슛 쏘는 동작에서 파울당하면?</div><div class="a">슛 동작 중이면 자유투를 줍니다. 들어갔으면 득점 + 자유투 1개, 안 들어갔으면 위치에 따라 2개(3점 지역은 3개).</div></div>
+        <div class="qa"><div class="q">Q. 공 받으면서 발을 몇 개까지 디뎌도 되나?</div><div class="a">두 발이 바닥에 닿은 뒤 공을 잡으면 그다음 한 발이 피벗풋이 됩니다. 피벗풋은 패스·슛 전까지 떼면 안 되고, 떼고 드리블을 시작해도 안 됩니다.</div></div>
+        <div class="qa"><div class="q">Q. 드리블 멈췄다가 다시 쳐도 되나?</div><div class="a">안 됩니다(더블드리블). 단 슛이 림을 맞거나 상대가 건드린 뒤에는 다시 드리블할 수 있습니다.</div></div>
+        <div class="qa"><div class="q">Q. 발이 라인을 밟으면?</div><div class="a">아웃입니다. 공중에 떠 있다가 착지하며 라인을 밟기 전까지는 세이프입니다.</div></div>
+        <div class="qa"><div class="q">Q. 자유투 때 언제 레인에 들어가도 되나?</div><div class="a">슈터는 공이 림에 닿거나 들어갈 때까지 라인을 밟거나 넘으면 안 됩니다. 레인에 선 다른 선수는 공이 슈터 손을 떠난 뒤 들어갈 수 있습니다.</div></div>
+        <div class="qa"><div class="q">Q. 수비가 길 막고 섰는데 부딪히면 누구 파울?</div><div class="a">수비가 먼저 멈춰서 정당한 위치였으면 공격자 파울(차징), 움직이면서 막았으면 수비 파울(블로킹)입니다.</div></div>
+        <div class="qa"><div class="q">Q. 공이 백보드 뒤나 위로 넘어가면?</div><div class="a">아웃입니다. 백보드 뒷면·윗면을 맞거나 넘어간 공은 밖으로 나간 것으로 봅니다.</div></div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-h" onclick="rbAcc(this)">🤚 주요 심판 수신호<span>▾</span></button>
+      <div class="acc-b">
+        <div class="sig"><b>👊 주먹 쥐기</b>시계 정지 — 파울</div>
+        <div class="sig"><b>✋ 손바닥 펴기</b>시계 정지 — 바이얼레이션</div>
+        <div class="sig"><b>☝️ ✌️ 🖐 손가락</b>1점 · 2점 · 3점 득점</div>
+        <div class="sig"><b>✂️ 팔 교차</b>득점·플레이 취소</div>
+        <div class="sig"><b>👍 방향 가리킴</b>공격 방향 / 드로인</div>
+        <div class="sig"><b>🙆 머리 위 원</b>24초 샷클락 리셋</div>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-h" onclick="rbAcc(this)">📚 기본 용어·포지션 (신입 가이드)<span>▾</span></button>
+      <div class="acc-b">
+        <h5>포지션</h5>
+        <ul>
+          <li><b>가드</b>: 공을 운반하고 공격을 조율. 외곽 슛·돌파 담당 (PG=플레이메이커, SG=슈팅가드)</li>
+          <li><b>포워드</b>: 윙과 골밑을 오가며 득점·리바운드 (SF=스윙맨, PF=파워포워드)</li>
+          <li><b>센터</b>: 골밑 중심. 리바운드·블록·포스트 공격</li>
+        </ul>
+        <h5>자주 쓰는 용어</h5>
+        <ul>
+          <li><b>스크린(픽)</b>: 동료의 수비수를 몸으로 막아줘 길을 터주는 것</li>
+          <li><b>픽앤롤</b>: 스크린 걸어준 뒤 골밑으로 파고드는(롤인) 2대2 플레이</li>
+          <li><b>박스아웃</b>: 리바운드 전에 상대를 등으로 막아 자리를 선점</li>
+          <li><b>컷 / 백도어</b>: 빈 공간으로 재빨리 침투하는 움직임</li>
+          <li><b>포스트업</b>: 골밑에서 상대를 등지고 자리 잡아 공략</li>
+          <li><b>맨투맨 / 지역방어(존)</b>: 1:1 전담 수비 / 구역을 나눠 지키는 수비</li>
+          <li><b>트랜지션</b>: 공수 전환 순간의 빠른 공격(속공)</li>
+          <li><b>턴오버</b>: 실책으로 공격권을 뺏기는 것</li>
+          <li><b>기본 스탯</b>: 득점·리바운드·어시스트(득점 연결 패스)·스틸(공 가로채기)·블록(슛 막기)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="acc-item">
+      <button class="acc-h" onclick="rbAcc(this)">🤝 코트 매너·에티켓<span>▾</span></button>
+      <div class="acc-b">
+        <ul>
+          <li>심판이 없을 땐 <b>파울·아웃을 셀프 콜</b>. 상대가 콜하면 일단 인정하고 넘어가기 (따질 건 경기 후에)</li>
+          <li>내가 파울했으면 <b>손 들어 자진신고</b> — 흐름이 깔끔해집니다</li>
+          <li>실력·체격 차가 클 땐 <b>과한 몸싸움과 속도를 자제</b>. 서로 다치지 않는 게 먼저</li>
+          <li><b>신입·새싹 배려</b> — 패스 기회를 주고, 공을 한 명에게만 몰아주지 않기</li>
+          <li>점수 차가 크게 벌어지면 봐주기보다 <b>전술 연습·약한 손 쓰기</b>로 재미있게</li>
+          <li>경기 전후 <b>인사와 하이파이브</b>, 상대의 좋은 플레이엔 리스펙트</li>
+          <li>시간 지키기, 공·조끼 등 <b>공용품 정리</b>는 다 같이</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="text-sm" style="text-align:center;margin-top:12px">출처: 2025 FIBA 공식 농구경기 규칙서 (대한민국농구협회) · 용어·매너는 동호회 기준</p>
   </div>
 </div>
 
@@ -921,6 +1115,15 @@ function showPage(id, btn) {
   if (id === 'best')    initBest();
   if (id === 'videos')  loadVideos();
 }
+
+// ========== RULEBOOK (로컬룰 / 공식규칙 전환) ==========
+function rbTab(t, btn) {
+  document.querySelectorAll('.rb-seg-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('rbLocal').style.display    = t==='local' ? '' : 'none';
+  document.getElementById('rbOfficial').style.display = t==='official' ? '' : 'none';
+}
+function rbAcc(h) { h.parentElement.classList.toggle('open'); }
 
 // ========== TOAST ==========
 function toast(msg, color = '#1e9e57') {
